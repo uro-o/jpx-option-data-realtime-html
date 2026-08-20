@@ -1,7 +1,8 @@
-```html
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+
 <meta charset="UTF-8">
 
 <meta
@@ -11,10 +12,11 @@
 
 <title>日経225オプション需給モニター</title>
 
+
 <style>
 
 /* =========================================================
-   Base
+   BASE
 ========================================================= */
 
 * {
@@ -44,21 +46,21 @@ body {
 
 
 /* =========================================================
-   Header
+   HEADER
 ========================================================= */
 
 .header {
+
     background: #111827;
 
     color: white;
 
-    padding: 18px 20px;
+    padding: 12px 16px;
 
-    box-shadow:
-        0 2px 8px rgba(0,0,0,0.12);
 }
 
 .header-inner {
+
     max-width: 1600px;
 
     margin: 0 auto;
@@ -69,56 +71,62 @@ body {
 
     align-items: center;
 
-    gap: 20px;
 }
 
 .title {
-    font-size: 22px;
+
+    font-size: 20px;
 
     font-weight: 700;
 
-    letter-spacing: 0.02em;
 }
 
 .subtitle {
-    margin-top: 5px;
+
+    margin-top: 3px;
 
     color: #9ca3af;
 
-    font-size: 12px;
+    font-size: 11px;
+
 }
 
 .update-info {
+
     text-align: right;
 
-    font-size: 12px;
+    font-size: 11px;
 
-    line-height: 1.7;
+    line-height: 1.5;
 
     color: #d1d5db;
+
 }
 
 
 /* =========================================================
-   Controls
+   CONTROLS
 ========================================================= */
 
 .controls {
+
     max-width: 1600px;
 
-    margin: 15px auto 0;
+    margin: 8px auto 0;
 
-    padding: 0 15px;
+    padding: 0 10px;
+
 }
 
 .control-box {
+
     background: white;
 
     border: 1px solid #d1d5db;
 
-    border-radius: 8px;
+    border-radius: 6px;
 
-    padding: 12px 15px;
+    padding: 7px 10px;
 
     display: flex;
 
@@ -126,77 +134,71 @@ body {
 
     align-items: center;
 
-    gap: 12px;
+    gap: 8px;
 
-    box-shadow:
-        0 1px 3px rgba(0,0,0,0.04);
 }
 
 .control-group {
+
     display: flex;
 
     align-items: center;
 
-    gap: 7px;
+    gap: 5px;
+
 }
 
 .control-label {
-    font-size: 13px;
+
+    font-size: 11px;
 
     font-weight: 700;
+
 }
 
 select,
 button {
-    appearance: none;
 
     border: 1px solid #cbd5e1;
 
     background: white;
 
-    border-radius: 5px;
+    border-radius: 4px;
 
-    padding: 7px 12px;
+    padding: 5px 8px;
 
-    font-size: 13px;
+    font-size: 11px;
 
     color: #1f2937;
 
     cursor: pointer;
-}
 
-select:hover,
-button:hover {
-    background: #f8fafc;
-
-    border-color: #94a3b8;
-}
-
-button {
-    font-weight: 600;
 }
 
 
 /* =========================================================
-   Market information
+   MARKET INFO
 ========================================================= */
 
 .market-info {
+
     max-width: 1600px;
 
-    margin: 12px auto 15px;
+    margin: 8px auto;
 
-    padding: 0 15px;
+    padding: 0 10px;
+
 }
 
 .market-box {
+
     background: white;
 
     border: 1px solid #d1d5db;
 
-    border-radius: 8px;
+    border-radius: 6px;
 
-    padding: 13px 18px;
+    padding: 8px 12px;
 
     display: flex;
 
@@ -204,243 +206,300 @@ button {
 
     align-items: center;
 
-    gap: 35px;
+    gap: 25px;
 
-    box-shadow:
-        0 1px 3px rgba(0,0,0,0.04);
 }
 
 .market-item {
+
     display: flex;
 
     flex-direction: column;
 
-    min-width: 100px;
 }
 
 .market-label {
+
     color: #6b7280;
 
-    font-size: 11px;
+    font-size: 9px;
 
-    margin-bottom: 3px;
 }
 
 .market-value {
-    font-size: 20px;
+
+    font-size: 16px;
 
     font-weight: 700;
+
 }
 
 .market-small {
-    font-size: 15px;
-}
 
-.market-note {
-    color: #6b7280;
+    font-size: 13px;
 
-    font-size: 11px;
 }
 
 
 /* =========================================================
-   Chart wrapper
+   MAX PAIN
+========================================================= */
+
+.max-pain-box {
+
+    background: #fff7ed;
+
+    border: 1px solid #fdba74;
+
+    border-radius: 6px;
+
+    padding: 8px 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+.max-pain-label {
+
+    color: #9a3412;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+}
+
+.max-pain-value {
+
+    color: #ea580c;
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   CHART
 ========================================================= */
 
 .chart-wrapper {
+
     max-width: 1600px;
 
     margin: 0 auto;
 
-    padding: 0 15px 30px;
+    padding: 0 10px 20px;
+
 }
 
 .chart-container {
+
     background: white;
 
     border: 1px solid #d1d5db;
 
-    border-radius: 8px;
+    border-radius: 6px;
 
     overflow: hidden;
 
-    box-shadow:
-        0 1px 4px rgba(0,0,0,0.05);
 }
 
 
 /* =========================================================
-   Chart header
+   FIXED HEADER
 ========================================================= */
 
 .chart-header {
+
     display: grid;
 
     grid-template-columns:
         minmax(130px, 1fr)
         minmax(130px, 1fr)
-        105px
+        95px
         minmax(130px, 1fr)
         minmax(130px, 1fr);
 
-    min-width: 750px;
+    min-width: 700px;
 
     background: #f8fafc;
 
-    border-bottom: 2px solid #1f2937;
+    border-bottom: 2px solid #111827;
 
     position: sticky;
 
     top: 0;
 
-    z-index: 10;
+    z-index: 100;
+
 }
 
 .chart-header > div {
-    padding: 10px 6px;
+
+    padding: 7px 4px;
 
     text-align: center;
 
-    font-size: 12px;
+    font-size: 10px;
 
     font-weight: 700;
+
 }
 
 .call-header {
+
     color: #2563eb;
+
 }
 
 .put-header {
+
     color: #dc2626;
+
 }
 
 .strike-header {
+
     color: #111827;
 
     border-left: 1px solid #d1d5db;
 
     border-right: 1px solid #d1d5db;
+
 }
 
 
 /* =========================================================
-   Chart body
+   CHART BODY
 ========================================================= */
 
 #chart {
-    min-width: 750px;
+
+    min-width: 700px;
+
 }
 
 
 /* =========================================================
-   Option row
+   ROW
 ========================================================= */
 
 .option-row {
+
     display: grid;
 
     grid-template-columns:
         minmax(130px, 1fr)
         minmax(130px, 1fr)
-        105px
+        95px
         minmax(130px, 1fr)
         minmax(130px, 1fr);
 
-    min-height: 46px;
+    height: 32px;
 
     border-bottom: 1px solid #edf0f3;
 
     align-items: center;
 
-    transition:
-        background 0.12s ease;
 }
 
 .option-row:hover {
+
     background: #f8fafc;
+
 }
 
 
 /* =========================================================
-   Bar cells
+   BAR
 ========================================================= */
 
 .bar-cell {
+
     position: relative;
 
-    height: 46px;
+    height: 32px;
 
-    padding: 0 6px;
+    padding: 0 4px;
 
     display: flex;
 
     align-items: center;
+
 }
 
 .bar-area {
+
     position: relative;
 
     width: 100%;
 
-    height: 30px;
+    height: 22px;
+
 }
 
 .bar {
+
     position: absolute;
 
-    top: 5px;
+    top: 3px;
 
-    height: 20px;
+    height: 16px;
 
-    border-radius: 3px;
+    border-radius: 2px;
 
-    min-width: 0;
-
-    transition:
-        width 0.25s ease;
 }
 
-
-/* CALL */
-
 .call-volume .bar {
+
     right: 0;
 
     background: #93c5fd;
+
 }
 
 .call-oi .bar {
+
     right: 0;
 
     background: #2563eb;
+
 }
 
-
-/* PUT */
-
 .put-oi .bar {
+
     left: 0;
 
     background: #dc2626;
+
 }
 
 .put-volume .bar {
+
     left: 0;
 
     background: #fca5a5;
+
 }
 
 
 /* =========================================================
-   Bar values
+   VALUE
 ========================================================= */
 
 .bar-value {
+
     position: absolute;
 
     top: 0;
 
-    height: 30px;
+    height: 22px;
 
     display: flex;
 
@@ -448,56 +507,62 @@ button {
 
     z-index: 3;
 
-    font-size: 10px;
+    font-size: 9px;
 
     font-weight: 600;
 
     white-space: nowrap;
 
-    pointer-events: none;
 }
 
 .call-volume .bar-value,
 .call-oi .bar-value {
-    right: 5px;
+
+    right: 4px;
+
 }
 
 .put-oi .bar-value,
 .put-volume .bar-value {
-    left: 5px;
+
+    left: 4px;
+
 }
 
-
-/*
-   棒が非常に短い場合は数字が棒の外側に出ても
-   見やすいようにする
-*/
-
 .call-volume .bar-value {
+
     color: #1e3a8a;
+
 }
 
 .call-oi .bar-value {
-    color: #ffffff;
+
+    color: white;
+
 }
 
 .put-oi .bar-value {
-    color: #ffffff;
+
+    color: white;
+
 }
 
 .put-volume .bar-value {
+
     color: #7f1d1d;
+
 }
 
 
 /* =========================================================
-   Strike
+   STRIKE
 ========================================================= */
 
 .strike {
+
     position: relative;
 
-    height: 46px;
+    height: 32px;
 
     display: flex;
 
@@ -511,243 +576,187 @@ button {
 
     border-right: 1px solid #d1d5db;
 
-    font-size: 13px;
+    font-size: 10px;
 
     font-weight: 700;
 
-    z-index: 4;
-}
-
-.strike.current-price {
-    background: #fff7ed;
-
-    color: #ea580c;
-
-    box-shadow:
-        inset 0 2px 0 #f97316,
-        inset 0 -2px 0 #f97316;
-}
-
-.current-label {
-    position: absolute;
-
-    top: 1px;
-
-    right: 3px;
-
-    color: #ea580c;
-
-    font-size: 8px;
-
-    font-weight: 700;
 }
 
 
 /* =========================================================
-   ATM / center row
+   MAX PAIN ROW
 ========================================================= */
 
-.atm-row {
-    background: #fffaf5;
-}
+.max-pain-row {
 
-.atm-row .strike {
     background: #fff7ed;
 
-    color: #c2410c;
+}
+
+.max-pain-row .strike {
+
+    background: #ffedd5;
+
+    color: #ea580c;
 
     border-top: 2px solid #f97316;
 
     border-bottom: 2px solid #f97316;
+
+}
+
+.max-pain-marker {
+
+    position: absolute;
+
+    right: 3px;
+
+    top: 1px;
+
+    font-size: 7px;
+
+    color: #ea580c;
+
 }
 
 
 /* =========================================================
-   Legend
+   LEGEND
 ========================================================= */
 
 .legend {
-    padding: 11px 15px;
+
+    padding: 7px 12px;
 
     display: flex;
 
     flex-wrap: wrap;
 
-    gap: 18px;
+    gap: 15px;
 
     border-top: 1px solid #e5e7eb;
 
     color: #6b7280;
 
-    font-size: 10px;
+    font-size: 9px;
+
 }
 
 .legend-item {
+
     display: flex;
 
     align-items: center;
 
-    gap: 5px;
+    gap: 4px;
+
 }
 
 .legend-color {
-    width: 18px;
 
-    height: 10px;
+    width: 15px;
+
+    height: 8px;
 
     border-radius: 2px;
+
 }
 
 .legend-call-volume {
+
     background: #93c5fd;
+
 }
 
 .legend-call-oi {
+
     background: #2563eb;
+
 }
 
 .legend-put-oi {
+
     background: #dc2626;
+
 }
 
 .legend-put-volume {
+
     background: #fca5a5;
+
 }
 
 
 /* =========================================================
-   Message
+   MESSAGE
 ========================================================= */
 
 .message {
-    padding: 45px 20px;
+
+    padding: 40px 15px;
 
     text-align: center;
 
     color: #6b7280;
 
-    font-size: 13px;
+    font-size: 12px;
+
 }
 
 .message.error {
+
     color: #dc2626;
+
 }
 
 
 /* =========================================================
-   Footer
-========================================================= */
-
-.footer {
-    max-width: 1600px;
-
-    margin: 0 auto;
-
-    padding: 0 15px 25px;
-
-    color: #9ca3af;
-
-    font-size: 10px;
-
-    text-align: right;
-}
-
-
-/* =========================================================
-   Mobile
+   MOBILE
 ========================================================= */
 
 @media (max-width: 900px) {
 
-    .header {
-        padding: 14px;
-    }
-
-    .header-inner {
-        align-items: flex-start;
-    }
-
     .title {
-        font-size: 18px;
+
+        font-size: 17px;
+
     }
 
     .subtitle {
-        font-size: 10px;
+
+        font-size: 9px;
+
     }
 
     .update-info {
-        font-size: 10px;
-    }
 
-    .controls,
-    .market-info,
-    .chart-wrapper {
-        padding-left: 5px;
-        padding-right: 5px;
+        font-size: 9px;
+
     }
 
     .market-box {
-        gap: 20px;
-    }
 
-    .market-value {
-        font-size: 17px;
+        gap: 15px;
+
     }
 
     .chart-header,
     .option-row {
+
         grid-template-columns:
-            minmax(105px, 1fr)
-            minmax(105px, 1fr)
+            115px
+            115px
             75px
-            minmax(105px, 1fr)
-            minmax(105px, 1fr);
+            115px
+            115px;
+
     }
 
     #chart,
     .chart-header {
-        min-width: 590px;
-    }
 
-    .chart-header > div {
-        font-size: 10px;
-    }
+        min-width: 535px;
 
-    .bar-value {
-        font-size: 9px;
-    }
-
-    .strike {
-        font-size: 11px;
-    }
-
-}
-
-
-/* =========================================================
-   Very small screen
-========================================================= */
-
-@media (max-width: 600px) {
-
-    .header-inner {
-        flex-direction: column;
-    }
-
-    .update-info {
-        text-align: left;
-    }
-
-    .control-box {
-        gap: 8px;
-    }
-
-    .control-group {
-        width: 100%;
-    }
-
-    select {
-        flex: 1;
     }
 
 }
@@ -794,7 +803,6 @@ button {
             </div>
 
             <div>
-                ステータス：
                 <span id="dataStatus">
                     読み込み中
                 </span>
@@ -823,9 +831,11 @@ button {
             </span>
 
             <select id="contractSelect">
-                <option value="">
+
+                <option>
                     読み込み中...
                 </option>
+
             </select>
 
         </div>
@@ -834,7 +844,7 @@ button {
         <div class="control-group">
 
             <span class="control-label">
-                表示範囲
+                表示
             </span>
 
             <select id="rangeSelect">
@@ -844,11 +854,11 @@ button {
                 </option>
 
                 <option value="near">
-                    現在値±5,000
+                    中央±5,000
                 </option>
 
                 <option value="near2500">
-                    現在値±2,500
+                    中央±2,500
                 </option>
 
             </select>
@@ -857,8 +867,28 @@ button {
 
 
         <button id="reloadButton">
+
             ↻ 更新
+
         </button>
+
+
+        <!-- MAX PAIN -->
+
+        <div class="max-pain-box">
+
+            <span class="max-pain-label">
+                MAX PAIN
+            </span>
+
+            <span
+                id="maxPainValue"
+                class="max-pain-value"
+            >
+                ---
+            </span>
+
+        </div>
 
 
     </div>
@@ -867,7 +897,7 @@ button {
 
 
 <!-- ========================================================
-     MARKET INFO
+     MARKET
 ========================================================= -->
 
 <section class="market-info">
@@ -886,10 +916,6 @@ button {
                 class="market-value"
             >
                 ---
-            </span>
-
-            <span class="market-note">
-                CSVから取得
             </span>
 
         </div>
@@ -946,7 +972,7 @@ button {
         <div class="market-item">
 
             <span class="market-label">
-                CALL/PUT OI比
+                CALL / PUT OI
             </span>
 
             <span
@@ -972,6 +998,8 @@ button {
 
     <div class="chart-container">
 
+
+        <!-- FIXED HEADER -->
 
         <div class="chart-header">
 
@@ -1013,8 +1041,8 @@ button {
 
                 <span
                     class="legend-color
-                           legend-call-volume">
-                </span>
+                           legend-call-volume"
+                ></span>
 
                 CALL Volume
 
@@ -1025,8 +1053,8 @@ button {
 
                 <span
                     class="legend-color
-                           legend-call-oi">
-                </span>
+                           legend-call-oi"
+                ></span>
 
                 CALL OI
 
@@ -1037,8 +1065,8 @@ button {
 
                 <span
                     class="legend-color
-                           legend-put-oi">
-                </span>
+                           legend-put-oi"
+                ></span>
 
                 PUT OI
 
@@ -1049,10 +1077,17 @@ button {
 
                 <span
                     class="legend-color
-                           legend-put-volume">
-                </span>
+                           legend-put-volume"
+                ></span>
 
                 PUT Volume
+
+            </div>
+
+
+            <div class="legend-item">
+
+                🟧 Max Pain
 
             </div>
 
@@ -1064,25 +1099,11 @@ button {
 </main>
 
 
-<div class="footer">
-
-    Data source: QRI / JPX option data
-
-</div>
-
-
 <script>
 
 /* =========================================================
-   Configuration
+   DATA URL
 ========================================================= */
-
-/*
-   GitHub RawからCSVを取得する。
-
-   GitHub Pagesの docs/ の外側にある
-   data/latest.csv を直接読み込む。
-*/
 
 const DATA_URL =
     "https://raw.githubusercontent.com/" +
@@ -1091,14 +1112,14 @@ const DATA_URL =
 
 
 /* =========================================================
-   State
+   STATE
 ========================================================= */
 
 let allData = [];
 
 let selectedContract = "";
 
-let currentPrice = null;
+let maxPain = null;
 
 
 /* =========================================================
@@ -1106,40 +1127,24 @@ let currentPrice = null;
 ========================================================= */
 
 const chart =
-    document.getElementById("chart");
+    document.getElementById(
+        "chart"
+    );
 
 const contractSelect =
-    document.getElementById("contractSelect");
+    document.getElementById(
+        "contractSelect"
+    );
 
 const rangeSelect =
-    document.getElementById("rangeSelect");
+    document.getElementById(
+        "rangeSelect"
+    );
 
 const reloadButton =
-    document.getElementById("reloadButton");
-
-const qriUpdateTime =
-    document.getElementById("qriUpdateTime");
-
-const collectedTime =
-    document.getElementById("collectedTime");
-
-const dataStatus =
-    document.getElementById("dataStatus");
-
-const currentPriceElement =
-    document.getElementById("currentPrice");
-
-const selectedContractElement =
-    document.getElementById("selectedContract");
-
-const totalCallOIElement =
-    document.getElementById("totalCallOI");
-
-const totalPutOIElement =
-    document.getElementById("totalPutOI");
-
-const oiRatioElement =
-    document.getElementById("oiRatio");
+    document.getElementById(
+        "reloadButton"
+    );
 
 
 /* =========================================================
@@ -1178,6 +1183,7 @@ function parseCSV(text) {
             i++;
 
             continue;
+
         }
 
 
@@ -1187,6 +1193,7 @@ function parseCSV(text) {
                 !insideQuotes;
 
             continue;
+
         }
 
 
@@ -1200,6 +1207,7 @@ function parseCSV(text) {
             value = "";
 
             continue;
+
         }
 
 
@@ -1215,7 +1223,9 @@ function parseCSV(text) {
                 char === "\r" &&
                 next === "\n"
             ) {
+
                 i++;
+
             }
 
 
@@ -1238,6 +1248,7 @@ function parseCSV(text) {
             value = "";
 
             continue;
+
         }
 
 
@@ -1266,11 +1277,6 @@ function parseCSV(text) {
 
     }
 
-
-    /*
-       CSVの先頭にBOMがあるため
-       trim()で除去する。
-    */
 
     const headers =
         rows[0].map(
@@ -1305,7 +1311,7 @@ function parseCSV(text) {
 
 
 /* =========================================================
-   Number conversion
+   Number
 ========================================================= */
 
 function num(value) {
@@ -1325,7 +1331,6 @@ function num(value) {
         Number(
             String(value)
                 .replace(/,/g, "")
-                .replace(/%/g, "")
                 .trim()
         );
 
@@ -1338,7 +1343,7 @@ function num(value) {
 
 
 /* =========================================================
-   Number formatting
+   Format
 ========================================================= */
 
 function formatNumber(value) {
@@ -1353,32 +1358,46 @@ function formatNumber(value) {
 
 
 /* =========================================================
-   Ratio formatting
+   Contract format
 ========================================================= */
 
-function formatRatio(value) {
+function formatContract(
+    contract
+) {
 
-    if (
-        !Number.isFinite(value)
-    ) {
+    const match =
+        String(contract)
+            .match(
+                /(\d{4})-(\d{1,2})/
+            );
 
-        return "---";
+
+    if (!match) {
+
+        return contract;
 
     }
 
 
-    return value.toFixed(2);
+    return (
+        match[1] +
+        "年" +
+        Number(match[2]) +
+        "月"
+    );
 
 }
 
 
 /* =========================================================
-   Load CSV
+   Load
 ========================================================= */
 
 async function loadData() {
 
-    dataStatus.textContent =
+    document.getElementById(
+        "dataStatus"
+    ).textContent =
         "読み込み中...";
 
 
@@ -1390,7 +1409,8 @@ async function loadData() {
                 "?t=" +
                 Date.now(),
                 {
-                    cache: "no-store"
+                    cache:
+                        "no-store"
                 }
             );
 
@@ -1418,18 +1438,21 @@ async function loadData() {
         ) {
 
             throw new Error(
-                "CSVにデータがありません"
+                "CSVが空です"
             );
 
         }
 
 
-        dataStatus.textContent =
-            `${allData.length.toLocaleString()} records`;
+        document.getElementById(
+            "dataStatus"
+        ).textContent =
+            allData.length
+                .toLocaleString() +
+            " records";
 
 
-        updateHeaderInfo();
-
+        updateHeader();
 
         initialize();
 
@@ -1437,12 +1460,13 @@ async function loadData() {
     } catch (error) {
 
         console.error(
-            "CSV読み込みエラー:",
             error
         );
 
 
-        dataStatus.textContent =
+        document.getElementById(
+            "dataStatus"
+        ).textContent =
             "読み込みエラー";
 
 
@@ -1450,17 +1474,11 @@ async function loadData() {
 
             <div class="message error">
 
-                データを読み込めませんでした。<br><br>
-
-                ${escapeHTML(
-                    error.message
-                )}
+                データを読み込めませんでした。
 
                 <br><br>
 
-                <small>
-                    ${escapeHTML(DATA_URL)}
-                </small>
+                ${error.message}
 
             </div>
 
@@ -1472,10 +1490,10 @@ async function loadData() {
 
 
 /* =========================================================
-   Header information
+   Header
 ========================================================= */
 
-function updateHeaderInfo() {
+function updateHeader() {
 
     if (
         !allData.length
@@ -1490,12 +1508,16 @@ function updateHeaderInfo() {
         allData[0];
 
 
-    qriUpdateTime.textContent =
+    document.getElementById(
+        "qriUpdateTime"
+    ).textContent =
         first.qri_update_time ||
         "---";
 
 
-    collectedTime.textContent =
+    document.getElementById(
+        "collectedTime"
+    ).textContent =
         first.collected_at ||
         "---";
 
@@ -1507,10 +1529,6 @@ function updateHeaderInfo() {
 ========================================================= */
 
 function initialize() {
-
-    /*
-       contractの一覧を取得
-    */
 
     const contracts =
         [
@@ -1524,10 +1542,6 @@ function initialize() {
             )
         ];
 
-
-    /*
-       昇順
-    */
 
     contracts.sort(
         (a, b) =>
@@ -1567,31 +1581,21 @@ function initialize() {
     );
 
 
-    /*
-       初回は最も近い限月
-    */
-
     if (
-        contracts.length > 0
+        !selectedContract ||
+        !contracts.includes(
+            selectedContract
+        )
     ) {
 
-        if (
-            !selectedContract ||
-            !contracts.includes(
-                selectedContract
-            )
-        ) {
-
-            selectedContract =
-                contracts[0];
-
-        }
-
-
-        contractSelect.value =
-            selectedContract;
+        selectedContract =
+            contracts[0];
 
     }
+
+
+    contractSelect.value =
+        selectedContract;
 
 
     render();
@@ -1622,7 +1626,8 @@ function contractSortValue(
 
 
     return (
-        Number(match[1]) * 100 +
+        Number(match[1]) *
+        100 +
         Number(match[2])
     );
 
@@ -1630,73 +1635,12 @@ function contractSortValue(
 
 
 /* =========================================================
-   Contract display
-========================================================= */
-
-function formatContract(
-    contract
-) {
-
-    const match =
-        String(contract)
-            .match(
-                /(\d{4})-(\d{1,2})/
-            );
-
-
-    if (!match) {
-
-        return contract;
-
-    }
-
-
-    return (
-        match[1] +
-        "年" +
-        Number(match[2]) +
-        "月"
-    );
-
-}
-
-
-/* =========================================================
-   Find approximate current price
-========================================================= */
-
-function findCurrentPrice() {
-
-    /*
-       重要：
-       last_priceはオプション価格なので
-       日経225指数の現在値としては使用しない。
-
-       そのため、今回は
-       「StrikeからATMを推定する」
-       のではなく、
-
-       settlementの中心値を参考値として
-       表示することもしない。
-
-       currentPriceはnullとして扱う。
-    */
-
-    currentPrice = null;
-
-    currentPriceElement.textContent =
-        "---";
-
-}
-
-
-/* =========================================================
-   Build strike map
+   Strike Map
 ========================================================= */
 
 function buildStrikeMap() {
 
-    const strikeMap =
+    const map =
         new Map();
 
 
@@ -1708,100 +1652,208 @@ function buildStrikeMap() {
         );
 
 
-    rows.forEach(d => {
+    rows.forEach(
+        d => {
 
-        const strike =
-            num(d.strike);
-
-
-        if (
-            !strike
-        ) {
-
-            return;
-
-        }
+            const strike =
+                num(d.strike);
 
 
-        if (
-            !strikeMap.has(
-                strike
-            )
-        ) {
+            if (!strike) {
 
-            strikeMap.set(
-                strike,
-                {
-                    strike: strike,
+                return;
 
-                    callVolume: 0,
-
-                    callOI: 0,
-
-                    putOI: 0,
-
-                    putVolume: 0
-                }
-            );
-
-        }
+            }
 
 
-        const item =
-            strikeMap.get(
-                strike
-            );
+            if (
+                !map.has(strike)
+            ) {
+
+                map.set(
+                    strike,
+                    {
+                        strike,
+
+                        callVolume: 0,
+
+                        callOI: 0,
+
+                        putOI: 0,
+
+                        putVolume: 0
+                    }
+                );
+
+            }
 
 
-        const type =
-            String(
-                d.option_type || ""
-            )
-            .trim()
-            .toUpperCase();
+            const item =
+                map.get(strike);
 
 
-        const volume =
-            num(d.volume);
+            const type =
+                String(
+                    d.option_type ||
+                    ""
+                )
+                .trim()
+                .toUpperCase();
 
 
-        const oi =
-            num(d.open_interest);
+            if (
+                type === "CALL" ||
+                type === "C"
+            ) {
+
+                item.callVolume =
+                    num(d.volume);
+
+                item.callOI =
+                    num(
+                        d.open_interest
+                    );
+
+            }
 
 
-        if (
-            type === "CALL" ||
-            type === "C"
-        ) {
+            if (
+                type === "PUT" ||
+                type === "P"
+            ) {
 
-            item.callVolume =
-                volume;
+                item.putVolume =
+                    num(d.volume);
 
-            item.callOI =
-                oi;
+                item.putOI =
+                    num(
+                        d.open_interest
+                    );
 
-        }
-
-
-        else if (
-            type === "PUT" ||
-            type === "P"
-        ) {
-
-            item.putVolume =
-                volume;
-
-            item.putOI =
-                oi;
+            }
 
         }
-
-    });
+    );
 
 
     return [
-        ...strikeMap.values()
+        ...map.values()
     ];
+
+}
+
+
+/* =========================================================
+   MAX PAIN
+========================================================= */
+
+function calculateMaxPain(
+    rows
+) {
+
+    if (
+        !rows.length
+    ) {
+
+        return null;
+
+    }
+
+
+    let bestStrike =
+        null;
+
+    let bestPain =
+        Infinity;
+
+
+    /*
+       各Strikeを
+       仮の満期価格として計算
+    */
+
+    rows.forEach(
+        candidate => {
+
+            const settlement =
+                candidate.strike;
+
+
+            let pain = 0;
+
+
+            rows.forEach(
+                r => {
+
+                    /*
+                       CALLの損失
+
+                       満期価格 >
+                       Strike
+
+                       の場合のみ発生
+                    */
+
+                    if (
+                        settlement >
+                        r.strike
+                    ) {
+
+                        pain +=
+                            (
+                                settlement -
+                                r.strike
+                            ) *
+                            r.callOI;
+
+                    }
+
+
+                    /*
+                       PUTの損失
+
+                       満期価格 <
+                       Strike
+
+                       の場合のみ発生
+                    */
+
+                    if (
+                        settlement <
+                        r.strike
+                    ) {
+
+                        pain +=
+                            (
+                                r.strike -
+                                settlement
+                            ) *
+                            r.putOI;
+
+                    }
+
+                }
+            );
+
+
+            if (
+                pain <
+                bestPain
+            ) {
+
+                bestPain =
+                    pain;
+
+                bestStrike =
+                    settlement;
+
+            }
+
+        }
+    );
+
+
+    return bestStrike;
 
 }
 
@@ -1812,16 +1864,7 @@ function buildStrikeMap() {
 
 function render() {
 
-    selectedContractElement.textContent =
-        formatContract(
-            selectedContract
-        );
-
-
-    findCurrentPrice();
-
-
-    let rows =
+    const rows =
         buildStrikeMap();
 
 
@@ -1832,7 +1875,9 @@ function render() {
         chart.innerHTML = `
 
             <div class="message">
-                選択した限月のデータがありません。
+
+                データがありません。
+
             </div>
 
         `;
@@ -1843,7 +1888,82 @@ function render() {
 
 
     /*
-       Strikeを高い順
+       MAX PAIN
+    */
+
+    maxPain =
+        calculateMaxPain(
+            rows
+        );
+
+
+    document.getElementById(
+        "maxPainValue"
+    ).textContent =
+        maxPain
+            ? formatNumber(maxPain)
+            : "---";
+
+
+    /*
+       OI totals
+    */
+
+    const totalCallOI =
+        rows.reduce(
+            (sum, r) =>
+                sum +
+                r.callOI,
+            0
+        );
+
+
+    const totalPutOI =
+        rows.reduce(
+            (sum, r) =>
+                sum +
+                r.putOI,
+            0
+        );
+
+
+    document.getElementById(
+        "totalCallOI"
+    ).textContent =
+        formatNumber(
+            totalCallOI
+        );
+
+
+    document.getElementById(
+        "totalPutOI"
+    ).textContent =
+        formatNumber(
+            totalPutOI
+        );
+
+
+    document.getElementById(
+        "oiRatio"
+    ).textContent =
+        totalPutOI > 0
+            ? (
+                totalCallOI /
+                totalPutOI
+            ).toFixed(2)
+            : "---";
+
+
+    document.getElementById(
+        "selectedContract"
+    ).textContent =
+        formatContract(
+            selectedContract
+        );
+
+
+    /*
+       Strike降順
     */
 
     rows.sort(
@@ -1861,30 +1981,16 @@ function render() {
         rangeSelect.value;
 
 
-    /*
-       現在値が取得できないため、
-       nearモードでは中央値付近を基準にする。
-
-       後で日経225現在値のデータソースを
-       追加すれば正確なATM表示に変更可能。
-    */
-
     if (
         range !== "all"
     ) {
 
-        const strikes =
-            rows.map(
-                r => r.strike
-            );
-
-
         const center =
-            strikes[
+            rows[
                 Math.floor(
-                    strikes.length / 2
+                    rows.length / 2
                 )
-            ];
+            ].strike;
 
 
         const distance =
@@ -1893,14 +1999,23 @@ function render() {
                 : 5000;
 
 
-        rows =
+        const filtered =
             rows.filter(
                 r =>
                     Math.abs(
                         r.strike -
                         center
-                    ) <= distance
+                    ) <=
+                    distance
             );
+
+
+        rows.length = 0;
+
+        filtered.forEach(
+            r =>
+                rows.push(r)
+        );
 
     }
 
@@ -1949,53 +2064,6 @@ function render() {
         );
 
 
-    /*
-       合計OI
-    */
-
-    const totalCallOI =
-        rows.reduce(
-            (sum, r) =>
-                sum + r.callOI,
-            0
-        );
-
-
-    const totalPutOI =
-        rows.reduce(
-            (sum, r) =>
-                sum + r.putOI,
-            0
-        );
-
-
-    totalCallOIElement.textContent =
-        formatNumber(
-            totalCallOI
-        );
-
-
-    totalPutOIElement.textContent =
-        formatNumber(
-            totalPutOI
-        );
-
-
-    const ratio =
-        totalPutOI > 0
-            ? totalCallOI /
-              totalPutOI
-            : NaN;
-
-
-    oiRatioElement.textContent =
-        formatRatio(ratio);
-
-
-    /*
-       描画開始
-    */
-
     chart.innerHTML = "";
 
 
@@ -2013,69 +2081,66 @@ function render() {
 
 
             /*
-               バー幅
+               MAX PAINなら
+               行を強調
             */
 
-            const callVolumeWidth =
-                r.callVolume /
-                maxCallVolume *
-                100;
+            if (
+                r.strike ===
+                maxPain
+            ) {
 
+                row.classList.add(
+                    "max-pain-row"
+                );
 
-            const callOIWidth =
-                r.callOI /
-                maxCallOI *
-                100;
-
-
-            const putOIWidth =
-                r.putOI /
-                maxPutOI *
-                100;
-
-
-            const putVolumeWidth =
-                r.putVolume /
-                maxPutVolume *
-                100;
+            }
 
 
             /*
-               100%を超えないようにする
+               width
             */
 
-            const cv =
+            const callVolumeWidth =
                 Math.min(
                     100,
-                    callVolumeWidth
+                    r.callVolume /
+                    maxCallVolume *
+                    100
                 );
 
 
-            const coi =
+            const callOIWidth =
                 Math.min(
                     100,
-                    callOIWidth
+                    r.callOI /
+                    maxCallOI *
+                    100
                 );
 
 
-            const poi =
+            const putOIWidth =
                 Math.min(
                     100,
-                    putOIWidth
+                    r.putOI /
+                    maxPutOI *
+                    100
                 );
 
 
-            const pv =
+            const putVolumeWidth =
                 Math.min(
                     100,
-                    putVolumeWidth
+                    r.putVolume /
+                    maxPutVolume *
+                    100
                 );
 
 
             row.innerHTML = `
 
 
-                <!-- CALL Volume -->
+                <!-- CALL VOLUME -->
 
                 <div
                     class="
@@ -2089,7 +2154,8 @@ function render() {
                         <div
                             class="bar"
                             style="
-                                width:${cv}%;
+                                width:
+                                ${callVolumeWidth}%;
                             "
                         ></div>
 
@@ -2120,7 +2186,8 @@ function render() {
                         <div
                             class="bar"
                             style="
-                                width:${coi}%;
+                                width:
+                                ${callOIWidth}%;
                             "
                         ></div>
 
@@ -2145,6 +2212,21 @@ function render() {
                         r.strike
                     )}
 
+                    ${
+                        r.strike ===
+                        maxPain
+                            ? `
+                                <span
+                                    class="
+                                        max-pain-marker
+                                    "
+                                >
+                                    MAX
+                                </span>
+                              `
+                            : ""
+                    }
+
                 </div>
 
 
@@ -2162,7 +2244,8 @@ function render() {
                         <div
                             class="bar"
                             style="
-                                width:${poi}%;
+                                width:
+                                ${putOIWidth}%;
                             "
                         ></div>
 
@@ -2179,7 +2262,7 @@ function render() {
                 </div>
 
 
-                <!-- PUT Volume -->
+                <!-- PUT VOLUME -->
 
                 <div
                     class="
@@ -2190,19 +2273,24 @@ function render() {
 
                     <div class="bar-area">
 
-                        <div
-                            class="bar"
-                            style="
-                                width:${pv}%;
-                            "
-                        ></div>
+                        <div class="bar-area">
 
-                        <div
-                            class="bar-value"
-                        >
-                            ${formatNumber(
-                                r.putVolume
-                            )}
+                            <div
+                                class="bar"
+                                style="
+                                    width:
+                                    ${putVolumeWidth}%;
+                                "
+                            ></div>
+
+                            <div
+                                class="bar-value"
+                            >
+                                ${formatNumber(
+                                    r.putVolume
+                                )}
+                            </div>
+
                         </div>
 
                     </div>
@@ -2223,40 +2311,7 @@ function render() {
 
 
 /* =========================================================
-   Escape HTML
-========================================================= */
-
-function escapeHTML(
-    value
-) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* =========================================================
-   Events
+   EVENTS
 ========================================================= */
 
 contractSelect.addEventListener(
@@ -2293,7 +2348,7 @@ reloadButton.addEventListener(
 
 
 /* =========================================================
-   Automatic reload
+   AUTO UPDATE
 ========================================================= */
 
 setInterval(
@@ -2307,7 +2362,7 @@ setInterval(
 
 
 /* =========================================================
-   Start
+   START
 ========================================================= */
 
 loadData();
@@ -2316,5 +2371,5 @@ loadData();
 
 
 </body>
+
 </html>
-```
