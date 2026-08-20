@@ -1,0 +1,1461 @@
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nikkei225 Option Monitor</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans JP",
+        sans-serif;
+    background: #f5f6f8;
+    color: #222;
+}
+
+/* =========================
+   Header
+========================= */
+
+.header {
+    background: #111827;
+    color: white;
+    padding: 18px 24px;
+}
+
+.header-inner {
+    max-width: 1500px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+.update-info {
+    text-align: right;
+    font-size: 13px;
+}
+
+/* =========================
+   Controls
+========================= */
+
+.controls {
+    max-width: 1500px;
+    margin: 15px auto;
+    padding: 0 20px;
+}
+
+.control-box {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.control-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+select,
+button {
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+button:hover,
+select:hover {
+    background: #f3f4f6;
+}
+
+/* =========================
+   Market info
+========================= */
+
+.market-info {
+    max-width: 1500px;
+    margin: 0 auto 15px;
+    padding: 0 20px;
+}
+
+.market-box {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 35px;
+}
+
+.market-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.market-label {
+    font-size: 11px;
+    color: #777;
+}
+
+.market-value {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.market-change {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================
+   Main chart
+========================= */
+
+.chart-wrapper {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 20px 30px;
+}
+
+.chart-container {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Header */
+
+.chart-header {
+    display: grid;
+    grid-template-columns:
+        minmax(160px, 1fr)
+        minmax(160px, 1fr)
+        110px
+        minmax(160px, 1fr)
+        minmax(160px, 1fr);
+
+    border-bottom: 2px solid #333;
+    background: #fafafa;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.chart-header > div {
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.call-header {
+    color: #2563eb;
+}
+
+.put-header {
+    color: #dc2626;
+}
+
+.strike-header {
+    color: #111;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+/* =========================
+   Rows
+========================= */
+
+.option-row {
+    display: grid;
+    grid-template-columns:
+        minmax(160px, 1fr)
+        minmax(160px, 1fr)
+        110px
+        minmax(160px, 1fr)
+        minmax(160px, 1fr);
+
+    min-height: 48px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.option-row:hover {
+    background: #f8fafc;
+}
+
+/* =========================
+   Bar cells
+========================= */
+
+.bar-cell {
+    position: relative;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 7px;
+}
+
+.bar-area {
+    position: relative;
+    width: 100%;
+    height: 28px;
+}
+
+.bar {
+    position: absolute;
+    top: 4px;
+    height: 20px;
+    border-radius: 3px;
+    transition: width 0.25s ease;
+}
+
+.call-volume .bar {
+    right: 0;
+    background: #93c5fd;
+}
+
+.call-oi .bar {
+    right: 0;
+    background: #2563eb;
+}
+
+.put-oi .bar {
+    left: 0;
+    background: #dc2626;
+}
+
+.put-volume .bar {
+    left: 0;
+    background: #fca5a5;
+}
+
+.bar-value {
+    position: absolute;
+    top: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 2;
+}
+
+.call-volume .bar-value,
+.call-oi .bar-value {
+    right: 5px;
+}
+
+.put-oi .bar-value,
+.put-volume .bar-value {
+    left: 5px;
+}
+
+/* =========================
+   Strike
+========================= */
+
+.strike {
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+
+    background: #fff;
+    position: relative;
+}
+
+.strike.current-price {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.current-label {
+    position: absolute;
+    top: -1px;
+    right: 3px;
+    font-size: 9px;
+    color: #ea580c;
+}
+
+/* =========================
+   ATM
+========================= */
+
+.atm-row {
+    background: #fff7ed;
+}
+
+.atm-row .strike {
+    border-top: 2px solid #f97316;
+    border-bottom: 2px solid #f97316;
+}
+
+/* =========================
+   Legend
+========================= */
+
+.legend {
+    padding: 12px 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 11px;
+    color: #555;
+    border-top: 1px solid #ddd;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-color {
+    width: 18px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.legend-call-volume {
+    background: #93c5fd;
+}
+
+.legend-call-oi {
+    background: #2563eb;
+}
+
+.legend-put-oi {
+    background: #dc2626;
+}
+
+.legend-put-volume {
+    background: #fca5a5;
+}
+
+/* =========================
+   Loading / Error
+========================= */
+
+.message {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+}
+
+.error {
+    color: #dc2626;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 900px) {
+
+    body {
+        font-size: 12px;
+    }
+
+    .header {
+        padding: 14px;
+    }
+
+    .header-inner {
+        align-items: flex-start;
+    }
+
+    .title {
+        font-size: 18px;
+    }
+
+    .update-info {
+        font-size: 11px;
+    }
+
+    .chart-wrapper {
+        padding: 0 5px 20px;
+    }
+
+    .market-info {
+        padding: 0 5px;
+    }
+
+    .controls {
+        padding: 0 5px;
+    }
+
+    .chart-header,
+    .option-row {
+        grid-template-columns:
+            minmax(100px, 1fr)
+            minmax(100px, 1fr)
+            75px
+            minmax(100px, 1fr)
+            minmax(100px, 1fr);
+    }
+
+    .chart-header > div {
+        font-size: 10px;
+        padding: 8px 2px;
+    }
+
+    .bar-value {
+        font-size: 9px;
+    }
+
+    .strike {
+        font-size: 11px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     Header
+========================= -->
+
+<header class="header">
+
+    <div class="header-inner">
+
+        <div>
+            <div class="title">
+                日経225オプション需給モニター
+            </div>
+
+            <div class="subtitle">
+                CALL / PUT Volume & Open Interest
+            </div>
+        </div>
+
+        <div class="update-info">
+            <div>
+                更新：
+                <span id="updateTime">---</span>
+            </div>
+
+            <div>
+                データ：
+                <span id="dataStatus">読み込み中</span>
+            </div>
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================
+     Controls
+========================= -->
+
+<section class="controls">
+
+    <div class="control-box">
+
+        <div class="control-group">
+
+            <span class="control-label">
+                限月
+            </span>
+
+            <select id="contractSelect">
+                <option value="">読み込み中...</option>
+            </select>
+
+        </div>
+
+
+        <div class="control-group">
+
+            <span class="control-label">
+                表示
+            </span>
+
+            <select id="rangeSelect">
+
+                <option value="all">
+                    全Strike
+                </option>
+
+                <option value="near">
+                    ATM近辺
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button id="reloadButton">
+            ↻ 更新
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     Market info
+========================= -->
+
+<section class="market-info">
+
+    <div class="market-box">
+
+        <div class="market-item">
+
+            <span class="market-label">
+                現在値
+            </span>
+
+            <span
+                id="currentPrice"
+                class="market-value">
+                ---
+            </span>
+
+        </div>
+
+
+        <div class="market-item">
+
+            <span class="market-label">
+                前日比
+            </span>
+
+            <span
+                id="marketChange"
+                class="market-change">
+                ---
+            </span>
+
+        </div>
+
+
+        <div class="market-item">
+
+            <span class="market-label">
+                限月
+            </span>
+
+            <span
+                id="selectedContract"
+                class="market-value"
+                style="font-size:16px;">
+                ---
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     Chart
+========================= -->
+
+<main class="chart-wrapper">
+
+    <div class="chart-container">
+
+        <div class="chart-header">
+
+            <div class="call-header">
+                CALL Volume
+            </div>
+
+            <div class="call-header">
+                CALL OI
+            </div>
+
+            <div class="strike-header">
+                Strike
+            </div>
+
+            <div class="put-header">
+                PUT OI
+            </div>
+
+            <div class="put-header">
+                PUT Volume
+            </div>
+
+        </div>
+
+
+        <div id="chart">
+            <div class="message">
+                データを読み込んでいます...
+            </div>
+        </div>
+
+
+        <div class="legend">
+
+            <div class="legend-item">
+                <span class="legend-color legend-call-volume"></span>
+                CALL Volume
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color legend-call-oi"></span>
+                CALL OI
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color legend-put-oi"></span>
+                PUT OI
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color legend-put-volume"></span>
+                PUT Volume
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+/* =========================================================
+   Configuration
+========================================================= */
+
+const DATA_URL = "../data/latest.csv";
+
+
+/* =========================================================
+   State
+========================================================= */
+
+let allData = [];
+
+let selectedContract = "";
+
+let currentPrice = null;
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const chart = document.getElementById("chart");
+
+const contractSelect =
+    document.getElementById("contractSelect");
+
+const rangeSelect =
+    document.getElementById("rangeSelect");
+
+const reloadButton =
+    document.getElementById("reloadButton");
+
+const updateTime =
+    document.getElementById("updateTime");
+
+const dataStatus =
+    document.getElementById("dataStatus");
+
+const currentPriceElement =
+    document.getElementById("currentPrice");
+
+const marketChangeElement =
+    document.getElementById("marketChange");
+
+const selectedContractElement =
+    document.getElementById("selectedContract");
+
+
+/* =========================================================
+   CSV parser
+========================================================= */
+
+function parseCSV(text) {
+
+    const rows = [];
+
+    let row = [];
+
+    let value = "";
+
+    let insideQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+
+        const char = text[i];
+
+        const next = text[i + 1];
+
+        if (char === '"' && next === '"') {
+
+            value += '"';
+
+            i++;
+
+            continue;
+        }
+
+        if (char === '"') {
+
+            insideQuotes = !insideQuotes;
+
+            continue;
+        }
+
+        if (char === "," && !insideQuotes) {
+
+            row.push(value);
+
+            value = "";
+
+            continue;
+        }
+
+        if (
+            (char === "\n" || char === "\r") &&
+            !insideQuotes
+        ) {
+
+            if (char === "\r" && next === "\n") {
+                i++;
+            }
+
+            row.push(value);
+
+            if (row.some(v => v !== "")) {
+                rows.push(row);
+            }
+
+            row = [];
+
+            value = "";
+
+            continue;
+        }
+
+        value += char;
+    }
+
+    if (value !== "" || row.length > 0) {
+
+        row.push(value);
+
+        rows.push(row);
+    }
+
+    if (rows.length === 0) {
+        return [];
+    }
+
+    const headers = rows[0].map(h =>
+        h.trim()
+    );
+
+    return rows.slice(1).map(row => {
+
+        const obj = {};
+
+        headers.forEach((header, i) => {
+
+            obj[header] =
+                row[i] !== undefined
+                    ? row[i].trim()
+                    : "";
+
+        });
+
+        return obj;
+
+    });
+}
+
+
+/* =========================================================
+   Number helper
+========================================================= */
+
+function num(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return 0;
+    }
+
+    const n =
+        Number(
+            String(value)
+                .replace(/,/g, "")
+                .replace(/%/g, "")
+        );
+
+    return Number.isFinite(n)
+        ? n
+        : 0;
+}
+
+
+/* =========================================================
+   Format number
+========================================================= */
+
+function formatNumber(value) {
+
+    return Math.round(value)
+        .toLocaleString("ja-JP");
+}
+
+
+/* =========================================================
+   Load CSV
+========================================================= */
+
+async function loadData() {
+
+    dataStatus.textContent =
+        "読み込み中...";
+
+    try {
+
+        const response =
+            await fetch(
+                DATA_URL + "?t=" + Date.now()
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP " + response.status
+            );
+
+        }
+
+        const text =
+            await response.text();
+
+        allData =
+            parseCSV(text);
+
+        if (!allData.length) {
+
+            throw new Error(
+                "CSVにデータがありません"
+            );
+
+        }
+
+        dataStatus.textContent =
+            `${allData.length.toLocaleString()} records`;
+
+        initialize();
+
+    } catch (error) {
+
+        console.error(error);
+
+        dataStatus.textContent =
+            "読み込みエラー";
+
+        chart.innerHTML = `
+            <div class="message error">
+                データを読み込めませんでした。<br>
+                ${error.message}
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   Initialize
+========================================================= */
+
+function initialize() {
+
+    /*
+       QRI CSVでは contract が
+
+       2026-09
+       2026-10
+       2026-12
+
+       のようになっていることを想定。
+    */
+
+    const contracts =
+        [
+            ...new Set(
+                allData
+                    .map(d => d.contract)
+                    .filter(Boolean)
+            )
+        ];
+
+    contractSelect.innerHTML = "";
+
+    contracts.forEach(contract => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = contract;
+
+        option.textContent = contract;
+
+        contractSelect.appendChild(option);
+
+    });
+
+
+    if (contracts.length > 0) {
+
+        selectedContract =
+            contracts[0];
+
+        contractSelect.value =
+            selectedContract;
+
+    }
+
+
+    findCurrentPrice();
+
+    render();
+
+}
+
+
+/* =========================================================
+   Current price
+========================================================= */
+
+function findCurrentPrice() {
+
+    /*
+       QRIのCSVに指数価格などが存在する場合は
+       ここで取得する。
+
+       現時点ではCSVの settlement / last_price
+       を利用できるようにしている。
+    */
+
+    const contractRows =
+        allData.filter(
+            d =>
+                d.contract === selectedContract
+        );
+
+    const prices =
+        contractRows
+            .map(d => num(d.last_price))
+            .filter(v => v > 0);
+
+    if (prices.length) {
+
+        currentPrice =
+            prices[prices.length - 1];
+
+        currentPriceElement.textContent =
+            formatNumber(currentPrice);
+
+    } else {
+
+        currentPrice =
+            null;
+
+        currentPriceElement.textContent =
+            "---";
+
+    }
+
+}
+
+
+/* =========================================================
+   Render
+========================================================= */
+
+function render() {
+
+    selectedContractElement.textContent =
+        selectedContract || "---";
+
+    findCurrentPrice();
+
+    let rows =
+        allData.filter(
+            d =>
+                d.contract === selectedContract
+        );
+
+
+    /*
+       StrikeごとにCALL / PUTをまとめる
+    */
+
+    const strikeMap =
+        new Map();
+
+
+    rows.forEach(d => {
+
+        const strike =
+            num(d.strike);
+
+        if (!strike) {
+            return;
+        }
+
+        if (!strikeMap.has(strike)) {
+
+            strikeMap.set(
+                strike,
+                {
+                    strike,
+                    callVolume: 0,
+                    callOI: 0,
+                    putOI: 0,
+                    putVolume: 0
+                }
+            );
+
+        }
+
+        const item =
+            strikeMap.get(strike);
+
+        const optionType =
+            String(
+                d.option_type || ""
+            ).toUpperCase();
+
+
+        if (
+            optionType.includes("CALL") ||
+            optionType === "C"
+        ) {
+
+            item.callVolume =
+                num(d.volume);
+
+            item.callOI =
+                num(d.open_interest);
+
+        }
+
+
+        if (
+            optionType.includes("PUT") ||
+            optionType === "P"
+        ) {
+
+            item.putOI =
+                num(d.open_interest);
+
+            item.putVolume =
+                num(d.volume);
+
+        }
+
+    });
+
+
+    rows =
+        [...strikeMap.values()]
+            .sort(
+                (a, b) =>
+                    b.strike - a.strike
+            );
+
+
+    /*
+       ATM近辺
+    */
+
+    if (
+        rangeSelect.value === "near" &&
+        currentPrice
+    ) {
+
+        rows =
+            rows.filter(
+                r =>
+                    Math.abs(
+                        r.strike - currentPrice
+                    ) <= 5000
+            );
+
+    }
+
+
+    /*
+       最大値を取得
+    */
+
+    const maxCallVolume =
+        Math.max(
+            ...rows.map(r => r.callVolume),
+            1
+        );
+
+    const maxCallOI =
+        Math.max(
+            ...rows.map(r => r.callOI),
+            1
+        );
+
+    const maxPutOI =
+        Math.max(
+            ...rows.map(r => r.putOI),
+            1
+        );
+
+    const maxPutVolume =
+        Math.max(
+            ...rows.map(r => r.putVolume),
+            1
+        );
+
+
+    chart.innerHTML = "";
+
+
+    if (!rows.length) {
+
+        chart.innerHTML = `
+            <div class="message">
+                データがありません
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    rows.forEach(r => {
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "option-row";
+
+
+        /*
+           現在値に近いStrikeを判定
+        */
+
+        let isCurrent = false;
+
+        if (currentPrice) {
+
+            isCurrent =
+                Math.abs(
+                    r.strike - currentPrice
+                ) < 250;
+
+        }
+
+
+        if (isCurrent) {
+            row.classList.add("atm-row");
+        }
+
+
+        /*
+           CALL Volume
+        */
+
+        const callVolumeWidth =
+            Math.min(
+                100,
+                r.callVolume /
+                maxCallVolume *
+                100
+            );
+
+
+        /*
+           CALL OI
+        */
+
+        const callOIWidth =
+            Math.min(
+                100,
+                r.callOI /
+                maxCallOI *
+                100
+            );
+
+
+        /*
+           PUT OI
+        */
+
+        const putOIWidth =
+            Math.min(
+                100,
+                r.putOI /
+                maxPutOI *
+                100
+            );
+
+
+        /*
+           PUT Volume
+        */
+
+        const putVolumeWidth =
+            Math.min(
+                100,
+                r.putVolume /
+                maxPutVolume *
+                100
+            );
+
+
+        row.innerHTML = `
+
+            <!-- CALL Volume -->
+
+            <div class="bar-cell call-volume">
+
+                <div class="bar-area">
+
+                    <div
+                        class="bar"
+                        style="
+                            width:${callVolumeWidth}%;
+                        ">
+                    </div>
+
+                    <div class="bar-value">
+                        ${formatNumber(r.callVolume)}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CALL OI -->
+
+            <div class="bar-cell call-oi">
+
+                <div class="bar-area">
+
+                    <div
+                        class="bar"
+                        style="
+                            width:${callOIWidth}%;
+                        ">
+                    </div>
+
+                    <div class="bar-value">
+                        ${formatNumber(r.callOI)}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Strike -->
+
+            <div
+                class="
+                    strike
+                    ${isCurrent
+                        ? "current-price"
+                        : ""}
+                "
+            >
+
+                ${formatNumber(r.strike)}
+
+                ${
+                    isCurrent
+                        ? `<span class="current-label">
+                            現在値
+                           </span>`
+                        : ""
+                }
+
+            </div>
+
+
+            <!-- PUT OI -->
+
+            <div class="bar-cell put-oi">
+
+                <div class="bar-area">
+
+                    <div
+                        class="bar"
+                        style="
+                            width:${putOIWidth}%;
+                        ">
+                    </div>
+
+                    <div class="bar-value">
+                        ${formatNumber(r.putOI)}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PUT Volume -->
+
+            <div class="bar-cell put-volume">
+
+                <div class="bar-area">
+
+                    <div
+                        class="bar"
+                        style="
+                            width:${putVolumeWidth}%;
+                        ">
+                    </div>
+
+                    <div class="bar-value">
+                        ${formatNumber(r.putVolume)}
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        chart.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================================================
+   Events
+========================================================= */
+
+contractSelect.addEventListener(
+    "change",
+    () => {
+
+        selectedContract =
+            contractSelect.value;
+
+        render();
+
+    }
+);
+
+
+rangeSelect.addEventListener(
+    "change",
+    () => {
+
+        render();
+
+    }
+);
+
+
+reloadButton.addEventListener(
+    "click",
+    () => {
+
+        loadData();
+
+    }
+);
+
+
+/* =========================================================
+   Auto reload
+========================================================= */
+
+setInterval(
+    loadData,
+    60 * 1000
+);
+
+
+/* =========================================================
+   Start
+========================================================= */
+
+loadData();
+
+</script>
+
+</body>
+</html>
+```
