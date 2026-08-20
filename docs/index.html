@@ -3,189 +3,306 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Nikkei225 Option Monitor</title>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>日経225オプション需給モニター</title>
 
 <style>
+
+/* =========================================================
+   Base
+========================================================= */
+
 * {
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
+
+    background: #f3f4f6;
+
+    color: #1f2937;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         "Noto Sans JP",
+        "Yu Gothic",
+        Meiryo,
         sans-serif;
-    background: #f5f6f8;
-    color: #222;
 }
 
-/* =========================
+
+/* =========================================================
    Header
-========================= */
+========================================================= */
 
 .header {
     background: #111827;
+
     color: white;
-    padding: 18px 24px;
+
+    padding: 18px 20px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.12);
 }
 
 .header-inner {
-    max-width: 1500px;
-    margin: auto;
+    max-width: 1600px;
+
+    margin: 0 auto;
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     gap: 20px;
 }
 
 .title {
     font-size: 22px;
+
     font-weight: 700;
+
+    letter-spacing: 0.02em;
 }
 
 .subtitle {
-    font-size: 12px;
+    margin-top: 5px;
+
     color: #9ca3af;
-    margin-top: 4px;
+
+    font-size: 12px;
 }
 
 .update-info {
     text-align: right;
-    font-size: 13px;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+    color: #d1d5db;
 }
 
-/* =========================
+
+/* =========================================================
    Controls
-========================= */
+========================================================= */
 
 .controls {
-    max-width: 1500px;
-    margin: 15px auto;
-    padding: 0 20px;
+    max-width: 1600px;
+
+    margin: 15px auto 0;
+
+    padding: 0 15px;
 }
 
 .control-box {
     background: white;
-    border: 1px solid #ddd;
+
+    border: 1px solid #d1d5db;
+
     border-radius: 8px;
-    padding: 14px;
+
+    padding: 12px 15px;
+
     display: flex;
+
     flex-wrap: wrap;
+
     align-items: center;
+
     gap: 12px;
+
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.04);
 }
 
 .control-group {
     display: flex;
+
     align-items: center;
-    gap: 6px;
+
+    gap: 7px;
 }
 
 .control-label {
     font-size: 13px;
-    font-weight: 600;
+
+    font-weight: 700;
 }
 
 select,
 button {
-    border: 1px solid #ccc;
+    appearance: none;
+
+    border: 1px solid #cbd5e1;
+
     background: white;
+
     border-radius: 5px;
+
     padding: 7px 12px;
+
     font-size: 13px;
+
+    color: #1f2937;
+
     cursor: pointer;
 }
 
-button:hover,
-select:hover {
-    background: #f3f4f6;
+select:hover,
+button:hover {
+    background: #f8fafc;
+
+    border-color: #94a3b8;
 }
 
-/* =========================
-   Market info
-========================= */
+button {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   Market information
+========================================================= */
 
 .market-info {
-    max-width: 1500px;
-    margin: 0 auto 15px;
-    padding: 0 20px;
+    max-width: 1600px;
+
+    margin: 12px auto 15px;
+
+    padding: 0 15px;
 }
 
 .market-box {
     background: white;
-    border: 1px solid #ddd;
+
+    border: 1px solid #d1d5db;
+
     border-radius: 8px;
-    padding: 15px 20px;
+
+    padding: 13px 18px;
+
     display: flex;
+
     flex-wrap: wrap;
+
     align-items: center;
+
     gap: 35px;
+
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.04);
 }
 
 .market-item {
     display: flex;
+
     flex-direction: column;
+
+    min-width: 100px;
 }
 
 .market-label {
+    color: #6b7280;
+
     font-size: 11px;
-    color: #777;
+
+    margin-bottom: 3px;
 }
 
 .market-value {
-    font-size: 22px;
+    font-size: 20px;
+
     font-weight: 700;
 }
 
-.market-change {
-    font-size: 14px;
-    font-weight: 600;
+.market-small {
+    font-size: 15px;
 }
 
-/* =========================
-   Main chart
-========================= */
+.market-note {
+    color: #6b7280;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   Chart wrapper
+========================================================= */
 
 .chart-wrapper {
-    max-width: 1500px;
+    max-width: 1600px;
+
     margin: 0 auto;
-    padding: 0 20px 30px;
+
+    padding: 0 15px 30px;
 }
 
 .chart-container {
     background: white;
-    border: 1px solid #ddd;
+
+    border: 1px solid #d1d5db;
+
     border-radius: 8px;
+
     overflow: hidden;
+
+    box-shadow:
+        0 1px 4px rgba(0,0,0,0.05);
 }
 
-/* Header */
+
+/* =========================================================
+   Chart header
+========================================================= */
 
 .chart-header {
     display: grid;
-    grid-template-columns:
-        minmax(160px, 1fr)
-        minmax(160px, 1fr)
-        110px
-        minmax(160px, 1fr)
-        minmax(160px, 1fr);
 
-    border-bottom: 2px solid #333;
-    background: #fafafa;
+    grid-template-columns:
+        minmax(130px, 1fr)
+        minmax(130px, 1fr)
+        105px
+        minmax(130px, 1fr)
+        minmax(130px, 1fr);
+
+    min-width: 750px;
+
+    background: #f8fafc;
+
+    border-bottom: 2px solid #1f2937;
+
     position: sticky;
+
     top: 0;
-    z-index: 5;
+
+    z-index: 10;
 }
 
 .chart-header > div {
-    padding: 10px 8px;
+    padding: 10px 6px;
+
     text-align: center;
-    font-size: 13px;
+
+    font-size: 12px;
+
     font-weight: 700;
 }
 
@@ -198,89 +315,146 @@ select:hover {
 }
 
 .strike-header {
-    color: #111;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
+    color: #111827;
+
+    border-left: 1px solid #d1d5db;
+
+    border-right: 1px solid #d1d5db;
 }
 
-/* =========================
-   Rows
-========================= */
+
+/* =========================================================
+   Chart body
+========================================================= */
+
+#chart {
+    min-width: 750px;
+}
+
+
+/* =========================================================
+   Option row
+========================================================= */
 
 .option-row {
     display: grid;
-    grid-template-columns:
-        minmax(160px, 1fr)
-        minmax(160px, 1fr)
-        110px
-        minmax(160px, 1fr)
-        minmax(160px, 1fr);
 
-    min-height: 48px;
-    border-bottom: 1px solid #eee;
+    grid-template-columns:
+        minmax(130px, 1fr)
+        minmax(130px, 1fr)
+        105px
+        minmax(130px, 1fr)
+        minmax(130px, 1fr);
+
+    min-height: 46px;
+
+    border-bottom: 1px solid #edf0f3;
+
     align-items: center;
+
+    transition:
+        background 0.12s ease;
 }
 
 .option-row:hover {
     background: #f8fafc;
 }
 
-/* =========================
+
+/* =========================================================
    Bar cells
-========================= */
+========================================================= */
 
 .bar-cell {
     position: relative;
-    height: 38px;
+
+    height: 46px;
+
+    padding: 0 6px;
+
     display: flex;
+
     align-items: center;
-    padding: 0 7px;
 }
 
 .bar-area {
     position: relative;
+
     width: 100%;
-    height: 28px;
+
+    height: 30px;
 }
 
 .bar {
     position: absolute;
-    top: 4px;
+
+    top: 5px;
+
     height: 20px;
+
     border-radius: 3px;
-    transition: width 0.25s ease;
+
+    min-width: 0;
+
+    transition:
+        width 0.25s ease;
 }
+
+
+/* CALL */
 
 .call-volume .bar {
     right: 0;
+
     background: #93c5fd;
 }
 
 .call-oi .bar {
     right: 0;
+
     background: #2563eb;
 }
 
+
+/* PUT */
+
 .put-oi .bar {
     left: 0;
+
     background: #dc2626;
 }
 
 .put-volume .bar {
     left: 0;
+
     background: #fca5a5;
 }
 
+
+/* =========================================================
+   Bar values
+========================================================= */
+
 .bar-value {
     position: absolute;
+
     top: 0;
-    height: 28px;
+
+    height: 30px;
+
     display: flex;
+
     align-items: center;
-    font-size: 11px;
+
+    z-index: 3;
+
+    font-size: 10px;
+
     font-weight: 600;
+
     white-space: nowrap;
-    z-index: 2;
+
+    pointer-events: none;
 }
 
 .call-volume .bar-value,
@@ -293,75 +467,134 @@ select:hover {
     left: 5px;
 }
 
-/* =========================
+
+/*
+   棒が非常に短い場合は数字が棒の外側に出ても
+   見やすいようにする
+*/
+
+.call-volume .bar-value {
+    color: #1e3a8a;
+}
+
+.call-oi .bar-value {
+    color: #ffffff;
+}
+
+.put-oi .bar-value {
+    color: #ffffff;
+}
+
+.put-volume .bar-value {
+    color: #7f1d1d;
+}
+
+
+/* =========================================================
    Strike
-========================= */
+========================================================= */
 
 .strike {
-    height: 48px;
+    position: relative;
+
+    height: 46px;
+
     display: flex;
-    justify-content: center;
+
     align-items: center;
 
-    font-size: 14px;
+    justify-content: center;
+
+    background: white;
+
+    border-left: 1px solid #d1d5db;
+
+    border-right: 1px solid #d1d5db;
+
+    font-size: 13px;
+
     font-weight: 700;
 
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-
-    background: #fff;
-    position: relative;
+    z-index: 4;
 }
 
 .strike.current-price {
     background: #fff7ed;
+
     color: #ea580c;
+
+    box-shadow:
+        inset 0 2px 0 #f97316,
+        inset 0 -2px 0 #f97316;
 }
 
 .current-label {
     position: absolute;
-    top: -1px;
+
+    top: 1px;
+
     right: 3px;
-    font-size: 9px;
+
     color: #ea580c;
+
+    font-size: 8px;
+
+    font-weight: 700;
 }
 
-/* =========================
-   ATM
-========================= */
+
+/* =========================================================
+   ATM / center row
+========================================================= */
 
 .atm-row {
-    background: #fff7ed;
+    background: #fffaf5;
 }
 
 .atm-row .strike {
+    background: #fff7ed;
+
+    color: #c2410c;
+
     border-top: 2px solid #f97316;
+
     border-bottom: 2px solid #f97316;
 }
 
-/* =========================
+
+/* =========================================================
    Legend
-========================= */
+========================================================= */
 
 .legend {
-    padding: 12px 15px;
+    padding: 11px 15px;
+
     display: flex;
+
     flex-wrap: wrap;
+
     gap: 18px;
-    font-size: 11px;
-    color: #555;
-    border-top: 1px solid #ddd;
+
+    border-top: 1px solid #e5e7eb;
+
+    color: #6b7280;
+
+    font-size: 10px;
 }
 
 .legend-item {
     display: flex;
+
     align-items: center;
+
     gap: 5px;
 }
 
 .legend-color {
     width: 18px;
+
     height: 10px;
+
     border-radius: 2px;
 }
 
@@ -381,29 +614,50 @@ select:hover {
     background: #fca5a5;
 }
 
-/* =========================
-   Loading / Error
-========================= */
+
+/* =========================================================
+   Message
+========================================================= */
 
 .message {
+    padding: 45px 20px;
+
     text-align: center;
-    padding: 40px;
-    color: #777;
+
+    color: #6b7280;
+
+    font-size: 13px;
 }
 
-.error {
+.message.error {
     color: #dc2626;
 }
 
-/* =========================
+
+/* =========================================================
+   Footer
+========================================================= */
+
+.footer {
+    max-width: 1600px;
+
+    margin: 0 auto;
+
+    padding: 0 15px 25px;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    text-align: right;
+}
+
+
+/* =========================================================
    Mobile
-========================= */
+========================================================= */
 
 @media (max-width: 900px) {
-
-    body {
-        font-size: 12px;
-    }
 
     .header {
         padding: 14px;
@@ -417,35 +671,46 @@ select:hover {
         font-size: 18px;
     }
 
+    .subtitle {
+        font-size: 10px;
+    }
+
     .update-info {
-        font-size: 11px;
+        font-size: 10px;
     }
 
+    .controls,
+    .market-info,
     .chart-wrapper {
-        padding: 0 5px 20px;
+        padding-left: 5px;
+        padding-right: 5px;
     }
 
-    .market-info {
-        padding: 0 5px;
+    .market-box {
+        gap: 20px;
     }
 
-    .controls {
-        padding: 0 5px;
+    .market-value {
+        font-size: 17px;
     }
 
     .chart-header,
     .option-row {
         grid-template-columns:
-            minmax(100px, 1fr)
-            minmax(100px, 1fr)
+            minmax(105px, 1fr)
+            minmax(105px, 1fr)
             75px
-            minmax(100px, 1fr)
-            minmax(100px, 1fr);
+            minmax(105px, 1fr)
+            minmax(105px, 1fr);
+    }
+
+    #chart,
+    .chart-header {
+        min-width: 590px;
     }
 
     .chart-header > div {
         font-size: 10px;
-        padding: 8px 2px;
     }
 
     .bar-value {
@@ -455,40 +720,86 @@ select:hover {
     .strike {
         font-size: 11px;
     }
+
 }
+
+
+/* =========================================================
+   Very small screen
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .header-inner {
+        flex-direction: column;
+    }
+
+    .update-info {
+        text-align: left;
+    }
+
+    .control-box {
+        gap: 8px;
+    }
+
+    .control-group {
+        width: 100%;
+    }
+
+    select {
+        flex: 1;
+    }
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
-<!-- =========================
-     Header
-========================= -->
+
+<!-- ========================================================
+     HEADER
+========================================================= -->
 
 <header class="header">
 
     <div class="header-inner">
 
         <div>
+
             <div class="title">
                 日経225オプション需給モニター
             </div>
 
             <div class="subtitle">
-                CALL / PUT Volume & Open Interest
+                CALL Volume / CALL OI / Strike / PUT OI / PUT Volume
             </div>
+
         </div>
 
+
         <div class="update-info">
+
             <div>
-                更新：
-                <span id="updateTime">---</span>
+                QRI更新：
+                <span id="qriUpdateTime">---</span>
             </div>
 
             <div>
-                データ：
-                <span id="dataStatus">読み込み中</span>
+                データ取得：
+                <span id="collectedTime">---</span>
             </div>
+
+            <div>
+                ステータス：
+                <span id="dataStatus">
+                    読み込み中
+                </span>
+            </div>
+
         </div>
 
     </div>
@@ -496,13 +807,14 @@ select:hover {
 </header>
 
 
-<!-- =========================
-     Controls
-========================= -->
+<!-- ========================================================
+     CONTROLS
+========================================================= -->
 
 <section class="controls">
 
     <div class="control-box">
+
 
         <div class="control-group">
 
@@ -511,7 +823,9 @@ select:hover {
             </span>
 
             <select id="contractSelect">
-                <option value="">読み込み中...</option>
+                <option value="">
+                    読み込み中...
+                </option>
             </select>
 
         </div>
@@ -520,7 +834,7 @@ select:hover {
         <div class="control-group">
 
             <span class="control-label">
-                表示
+                表示範囲
             </span>
 
             <select id="rangeSelect">
@@ -530,7 +844,11 @@ select:hover {
                 </option>
 
                 <option value="near">
-                    ATM近辺
+                    現在値±5,000
+                </option>
+
+                <option value="near2500">
+                    現在値±2,500
                 </option>
 
             </select>
@@ -542,18 +860,20 @@ select:hover {
             ↻ 更新
         </button>
 
+
     </div>
 
 </section>
 
 
-<!-- =========================
-     Market info
-========================= -->
+<!-- ========================================================
+     MARKET INFO
+========================================================= -->
 
 <section class="market-info">
 
     <div class="market-box">
+
 
         <div class="market-item">
 
@@ -563,8 +883,13 @@ select:hover {
 
             <span
                 id="currentPrice"
-                class="market-value">
+                class="market-value"
+            >
                 ---
+            </span>
+
+            <span class="market-note">
+                CSVから取得
             </span>
 
         </div>
@@ -573,45 +898,80 @@ select:hover {
         <div class="market-item">
 
             <span class="market-label">
-                前日比
-            </span>
-
-            <span
-                id="marketChange"
-                class="market-change">
-                ---
-            </span>
-
-        </div>
-
-
-        <div class="market-item">
-
-            <span class="market-label">
-                限月
+                選択限月
             </span>
 
             <span
                 id="selectedContract"
-                class="market-value"
-                style="font-size:16px;">
+                class="market-value market-small"
+            >
                 ---
             </span>
 
         </div>
+
+
+        <div class="market-item">
+
+            <span class="market-label">
+                CALL OI合計
+            </span>
+
+            <span
+                id="totalCallOI"
+                class="market-value market-small"
+            >
+                ---
+            </span>
+
+        </div>
+
+
+        <div class="market-item">
+
+            <span class="market-label">
+                PUT OI合計
+            </span>
+
+            <span
+                id="totalPutOI"
+                class="market-value market-small"
+            >
+                ---
+            </span>
+
+        </div>
+
+
+        <div class="market-item">
+
+            <span class="market-label">
+                CALL/PUT OI比
+            </span>
+
+            <span
+                id="oiRatio"
+                class="market-value market-small"
+            >
+                ---
+            </span>
+
+        </div>
+
 
     </div>
 
 </section>
 
 
-<!-- =========================
-     Chart
-========================= -->
+<!-- ========================================================
+     CHART
+========================================================= -->
 
 <main class="chart-wrapper">
 
     <div class="chart-container">
+
 
         <div class="chart-header">
 
@@ -639,39 +999,76 @@ select:hover {
 
 
         <div id="chart">
+
             <div class="message">
                 データを読み込んでいます...
             </div>
+
         </div>
 
 
         <div class="legend">
 
             <div class="legend-item">
-                <span class="legend-color legend-call-volume"></span>
+
+                <span
+                    class="legend-color
+                           legend-call-volume">
+                </span>
+
                 CALL Volume
+
             </div>
 
+
             <div class="legend-item">
-                <span class="legend-color legend-call-oi"></span>
+
+                <span
+                    class="legend-color
+                           legend-call-oi">
+                </span>
+
                 CALL OI
+
             </div>
 
+
             <div class="legend-item">
-                <span class="legend-color legend-put-oi"></span>
+
+                <span
+                    class="legend-color
+                           legend-put-oi">
+                </span>
+
                 PUT OI
+
             </div>
 
+
             <div class="legend-item">
-                <span class="legend-color legend-put-volume"></span>
+
+                <span
+                    class="legend-color
+                           legend-put-volume">
+                </span>
+
                 PUT Volume
+
             </div>
 
         </div>
 
+
     </div>
 
 </main>
+
+
+<div class="footer">
+
+    Data source: QRI / JPX option data
+
+</div>
 
 
 <script>
@@ -680,7 +1077,17 @@ select:hover {
    Configuration
 ========================================================= */
 
-const DATA_URL = "data/latest.csv";
+/*
+   GitHub RawからCSVを取得する。
+
+   GitHub Pagesの docs/ の外側にある
+   data/latest.csv を直接読み込む。
+*/
+
+const DATA_URL =
+    "https://raw.githubusercontent.com/" +
+    "uro-o/jpx-option-data-realtime-html/" +
+    "main/data/latest.csv";
 
 
 /* =========================================================
@@ -698,7 +1105,8 @@ let currentPrice = null;
    DOM
 ========================================================= */
 
-const chart = document.getElementById("chart");
+const chart =
+    document.getElementById("chart");
 
 const contractSelect =
     document.getElementById("contractSelect");
@@ -709,8 +1117,11 @@ const rangeSelect =
 const reloadButton =
     document.getElementById("reloadButton");
 
-const updateTime =
-    document.getElementById("updateTime");
+const qriUpdateTime =
+    document.getElementById("qriUpdateTime");
+
+const collectedTime =
+    document.getElementById("collectedTime");
 
 const dataStatus =
     document.getElementById("dataStatus");
@@ -718,11 +1129,17 @@ const dataStatus =
 const currentPriceElement =
     document.getElementById("currentPrice");
 
-const marketChangeElement =
-    document.getElementById("marketChange");
-
 const selectedContractElement =
     document.getElementById("selectedContract");
+
+const totalCallOIElement =
+    document.getElementById("totalCallOI");
+
+const totalPutOIElement =
+    document.getElementById("totalPutOI");
+
+const oiRatioElement =
+    document.getElementById("oiRatio");
 
 
 /* =========================================================
@@ -739,13 +1156,22 @@ function parseCSV(text) {
 
     let insideQuotes = false;
 
-    for (let i = 0; i < text.length; i++) {
+
+    for (
+        let i = 0;
+        i < text.length;
+        i++
+    ) {
 
         const char = text[i];
 
         const next = text[i + 1];
 
-        if (char === '"' && next === '"') {
+
+        if (
+            char === '"' &&
+            next === '"'
+        ) {
 
             value += '"';
 
@@ -754,14 +1180,20 @@ function parseCSV(text) {
             continue;
         }
 
+
         if (char === '"') {
 
-            insideQuotes = !insideQuotes;
+            insideQuotes =
+                !insideQuotes;
 
             continue;
         }
 
-        if (char === "," && !insideQuotes) {
+
+        if (
+            char === "," &&
+            !insideQuotes
+        ) {
 
             row.push(value);
 
@@ -770,20 +1202,36 @@ function parseCSV(text) {
             continue;
         }
 
+
         if (
-            (char === "\n" || char === "\r") &&
+            (
+                char === "\n" ||
+                char === "\r"
+            ) &&
             !insideQuotes
         ) {
 
-            if (char === "\r" && next === "\n") {
+            if (
+                char === "\r" &&
+                next === "\n"
+            ) {
                 i++;
             }
 
+
             row.push(value);
 
-            if (row.some(v => v !== "")) {
+
+            if (
+                row.some(
+                    v => v !== ""
+                )
+            ) {
+
                 rows.push(row);
+
             }
+
 
             row = [];
 
@@ -792,45 +1240,72 @@ function parseCSV(text) {
             continue;
         }
 
+
         value += char;
+
     }
 
-    if (value !== "" || row.length > 0) {
+
+    if (
+        value !== "" ||
+        row.length > 0
+    ) {
 
         row.push(value);
 
         rows.push(row);
+
     }
 
-    if (rows.length === 0) {
+
+    if (
+        rows.length === 0
+    ) {
+
         return [];
+
     }
 
-    const headers = rows[0].map(h =>
-        h.trim()
-    );
 
-    return rows.slice(1).map(row => {
+    /*
+       CSVの先頭にBOMがあるため
+       trim()で除去する。
+    */
 
-        const obj = {};
+    const headers =
+        rows[0].map(
+            h => h.trim()
+        );
 
-        headers.forEach((header, i) => {
 
-            obj[header] =
-                row[i] !== undefined
-                    ? row[i].trim()
-                    : "";
+    return rows
+        .slice(1)
+        .map(row => {
+
+            const obj = {};
+
+
+            headers.forEach(
+                (header, i) => {
+
+                    obj[header] =
+                        row[i] !== undefined
+                            ? row[i].trim()
+                            : "";
+
+                }
+            );
+
+
+            return obj;
 
         });
 
-        return obj;
-
-    });
 }
 
 
 /* =========================================================
-   Number helper
+   Number conversion
 ========================================================= */
 
 function num(value) {
@@ -840,30 +1315,60 @@ function num(value) {
         value === undefined ||
         value === ""
     ) {
+
         return 0;
+
     }
+
 
     const n =
         Number(
             String(value)
                 .replace(/,/g, "")
                 .replace(/%/g, "")
+                .trim()
         );
+
 
     return Number.isFinite(n)
         ? n
         : 0;
+
 }
 
 
 /* =========================================================
-   Format number
+   Number formatting
 ========================================================= */
 
 function formatNumber(value) {
 
-    return Math.round(value)
-        .toLocaleString("ja-JP");
+    return Math.round(
+        value
+    ).toLocaleString(
+        "ja-JP"
+    );
+
+}
+
+
+/* =========================================================
+   Ratio formatting
+========================================================= */
+
+function formatRatio(value) {
+
+    if (
+        !Number.isFinite(value)
+    ) {
+
+        return "---";
+
+    }
+
+
+    return value.toFixed(2);
+
 }
 
 
@@ -876,28 +1381,41 @@ async function loadData() {
     dataStatus.textContent =
         "読み込み中...";
 
+
     try {
 
         const response =
             await fetch(
-                DATA_URL + "?t=" + Date.now()
+                DATA_URL +
+                "?t=" +
+                Date.now(),
+                {
+                    cache: "no-store"
+                }
             );
+
 
         if (!response.ok) {
 
             throw new Error(
-                "HTTP " + response.status
+                "HTTP " +
+                response.status
             );
 
         }
 
+
         const text =
             await response.text();
+
 
         allData =
             parseCSV(text);
 
-        if (!allData.length) {
+
+        if (
+            !allData.length
+        ) {
 
             throw new Error(
                 "CSVにデータがありません"
@@ -905,26 +1423,81 @@ async function loadData() {
 
         }
 
+
         dataStatus.textContent =
             `${allData.length.toLocaleString()} records`;
 
+
+        updateHeaderInfo();
+
+
         initialize();
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "CSV読み込みエラー:",
+            error
+        );
+
 
         dataStatus.textContent =
             "読み込みエラー";
 
+
         chart.innerHTML = `
+
             <div class="message error">
-                データを読み込めませんでした。<br>
-                ${error.message}
+
+                データを読み込めませんでした。<br><br>
+
+                ${escapeHTML(
+                    error.message
+                )}
+
+                <br><br>
+
+                <small>
+                    ${escapeHTML(DATA_URL)}
+                </small>
+
             </div>
+
         `;
 
     }
+
+}
+
+
+/* =========================================================
+   Header information
+========================================================= */
+
+function updateHeaderInfo() {
+
+    if (
+        !allData.length
+    ) {
+
+        return;
+
+    }
+
+
+    const first =
+        allData[0];
+
+
+    qriUpdateTime.textContent =
+        first.qri_update_time ||
+        "---";
+
+
+    collectedTime.textContent =
+        first.collected_at ||
+        "---";
 
 }
 
@@ -936,44 +1509,84 @@ async function loadData() {
 function initialize() {
 
     /*
-       QRI CSVでは contract が
-
-       2026-09
-       2026-10
-       2026-12
-
-       のようになっていることを想定。
+       contractの一覧を取得
     */
 
     const contracts =
         [
             ...new Set(
                 allData
-                    .map(d => d.contract)
+                    .map(
+                        d =>
+                            d.contract
+                    )
                     .filter(Boolean)
             )
         ];
 
-    contractSelect.innerHTML = "";
 
-    contracts.forEach(contract => {
+    /*
+       昇順
+    */
 
-        const option =
-            document.createElement("option");
-
-        option.value = contract;
-
-        option.textContent = contract;
-
-        contractSelect.appendChild(option);
-
-    });
+    contracts.sort(
+        (a, b) =>
+            contractSortValue(a) -
+            contractSortValue(b)
+    );
 
 
-    if (contracts.length > 0) {
+    contractSelect.innerHTML =
+        "";
 
-        selectedContract =
-            contracts[0];
+
+    contracts.forEach(
+        contract => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                contract;
+
+
+            option.textContent =
+                formatContract(
+                    contract
+                );
+
+
+            contractSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    /*
+       初回は最も近い限月
+    */
+
+    if (
+        contracts.length > 0
+    ) {
+
+        if (
+            !selectedContract ||
+            !contracts.includes(
+                selectedContract
+            )
+        ) {
+
+            selectedContract =
+                contracts[0];
+
+        }
+
 
         contractSelect.value =
             selectedContract;
@@ -981,55 +1594,214 @@ function initialize() {
     }
 
 
-    findCurrentPrice();
-
     render();
 
 }
 
 
 /* =========================================================
-   Current price
+   Contract sorting
+========================================================= */
+
+function contractSortValue(
+    contract
+) {
+
+    const match =
+        String(contract)
+            .match(
+                /(\d{4})-(\d{1,2})/
+            );
+
+
+    if (!match) {
+
+        return 999999;
+
+    }
+
+
+    return (
+        Number(match[1]) * 100 +
+        Number(match[2])
+    );
+
+}
+
+
+/* =========================================================
+   Contract display
+========================================================= */
+
+function formatContract(
+    contract
+) {
+
+    const match =
+        String(contract)
+            .match(
+                /(\d{4})-(\d{1,2})/
+            );
+
+
+    if (!match) {
+
+        return contract;
+
+    }
+
+
+    return (
+        match[1] +
+        "年" +
+        Number(match[2]) +
+        "月"
+    );
+
+}
+
+
+/* =========================================================
+   Find approximate current price
 ========================================================= */
 
 function findCurrentPrice() {
 
     /*
-       QRIのCSVに指数価格などが存在する場合は
-       ここで取得する。
+       重要：
+       last_priceはオプション価格なので
+       日経225指数の現在値としては使用しない。
 
-       現時点ではCSVの settlement / last_price
-       を利用できるようにしている。
+       そのため、今回は
+       「StrikeからATMを推定する」
+       のではなく、
+
+       settlementの中心値を参考値として
+       表示することもしない。
+
+       currentPriceはnullとして扱う。
     */
 
-    const contractRows =
+    currentPrice = null;
+
+    currentPriceElement.textContent =
+        "---";
+
+}
+
+
+/* =========================================================
+   Build strike map
+========================================================= */
+
+function buildStrikeMap() {
+
+    const strikeMap =
+        new Map();
+
+
+    const rows =
         allData.filter(
             d =>
-                d.contract === selectedContract
+                d.contract ===
+                selectedContract
         );
 
-    const prices =
-        contractRows
-            .map(d => num(d.last_price))
-            .filter(v => v > 0);
 
-    if (prices.length) {
+    rows.forEach(d => {
 
-        currentPrice =
-            prices[prices.length - 1];
+        const strike =
+            num(d.strike);
 
-        currentPriceElement.textContent =
-            formatNumber(currentPrice);
 
-    } else {
+        if (
+            !strike
+        ) {
 
-        currentPrice =
-            null;
+            return;
 
-        currentPriceElement.textContent =
-            "---";
+        }
 
-    }
+
+        if (
+            !strikeMap.has(
+                strike
+            )
+        ) {
+
+            strikeMap.set(
+                strike,
+                {
+                    strike: strike,
+
+                    callVolume: 0,
+
+                    callOI: 0,
+
+                    putOI: 0,
+
+                    putVolume: 0
+                }
+            );
+
+        }
+
+
+        const item =
+            strikeMap.get(
+                strike
+            );
+
+
+        const type =
+            String(
+                d.option_type || ""
+            )
+            .trim()
+            .toUpperCase();
+
+
+        const volume =
+            num(d.volume);
+
+
+        const oi =
+            num(d.open_interest);
+
+
+        if (
+            type === "CALL" ||
+            type === "C"
+        ) {
+
+            item.callVolume =
+                volume;
+
+            item.callOI =
+                oi;
+
+        }
+
+
+        else if (
+            type === "PUT" ||
+            type === "P"
+        ) {
+
+            item.putVolume =
+                volume;
+
+            item.putOI =
+                oi;
+
+        }
+
+    });
+
+
+    return [
+        ...strikeMap.values()
+    ];
 
 }
 
@@ -1041,154 +1813,28 @@ function findCurrentPrice() {
 function render() {
 
     selectedContractElement.textContent =
-        selectedContract || "---";
+        formatContract(
+            selectedContract
+        );
+
 
     findCurrentPrice();
 
+
     let rows =
-        allData.filter(
-            d =>
-                d.contract === selectedContract
-        );
+        buildStrikeMap();
 
-
-    /*
-       StrikeごとにCALL / PUTをまとめる
-    */
-
-    const strikeMap =
-        new Map();
-
-
-    rows.forEach(d => {
-
-        const strike =
-            num(d.strike);
-
-        if (!strike) {
-            return;
-        }
-
-        if (!strikeMap.has(strike)) {
-
-            strikeMap.set(
-                strike,
-                {
-                    strike,
-                    callVolume: 0,
-                    callOI: 0,
-                    putOI: 0,
-                    putVolume: 0
-                }
-            );
-
-        }
-
-        const item =
-            strikeMap.get(strike);
-
-        const optionType =
-            String(
-                d.option_type || ""
-            ).toUpperCase();
-
-
-        if (
-            optionType.includes("CALL") ||
-            optionType === "C"
-        ) {
-
-            item.callVolume =
-                num(d.volume);
-
-            item.callOI =
-                num(d.open_interest);
-
-        }
-
-
-        if (
-            optionType.includes("PUT") ||
-            optionType === "P"
-        ) {
-
-            item.putOI =
-                num(d.open_interest);
-
-            item.putVolume =
-                num(d.volume);
-
-        }
-
-    });
-
-
-    rows =
-        [...strikeMap.values()]
-            .sort(
-                (a, b) =>
-                    b.strike - a.strike
-            );
-
-
-    /*
-       ATM近辺
-    */
 
     if (
-        rangeSelect.value === "near" &&
-        currentPrice
+        !rows.length
     ) {
 
-        rows =
-            rows.filter(
-                r =>
-                    Math.abs(
-                        r.strike - currentPrice
-                    ) <= 5000
-            );
-
-    }
-
-
-    /*
-       最大値を取得
-    */
-
-    const maxCallVolume =
-        Math.max(
-            ...rows.map(r => r.callVolume),
-            1
-        );
-
-    const maxCallOI =
-        Math.max(
-            ...rows.map(r => r.callOI),
-            1
-        );
-
-    const maxPutOI =
-        Math.max(
-            ...rows.map(r => r.putOI),
-            1
-        );
-
-    const maxPutVolume =
-        Math.max(
-            ...rows.map(r => r.putVolume),
-            1
-        );
-
-
-    chart.innerHTML = "";
-
-
-    if (!rows.length) {
-
         chart.innerHTML = `
+
             <div class="message">
-                データがありません
+                選択した限月のデータがありません。
             </div>
+
         `;
 
         return;
@@ -1196,207 +1842,415 @@ function render() {
     }
 
 
-    rows.forEach(r => {
+    /*
+       Strikeを高い順
+    */
 
-        const row =
-            document.createElement("div");
-
-        row.className =
-            "option-row";
-
-
-        /*
-           現在値に近いStrikeを判定
-        */
-
-        let isCurrent = false;
-
-        if (currentPrice) {
-
-            isCurrent =
-                Math.abs(
-                    r.strike - currentPrice
-                ) < 250;
-
-        }
+    rows.sort(
+        (a, b) =>
+            b.strike -
+            a.strike
+    );
 
 
-        if (isCurrent) {
-            row.classList.add("atm-row");
-        }
+    /*
+       表示範囲
+    */
+
+    const range =
+        rangeSelect.value;
 
 
-        /*
-           CALL Volume
-        */
+    /*
+       現在値が取得できないため、
+       nearモードでは中央値付近を基準にする。
 
-        const callVolumeWidth =
-            Math.min(
-                100,
+       後で日経225現在値のデータソースを
+       追加すれば正確なATM表示に変更可能。
+    */
+
+    if (
+        range !== "all"
+    ) {
+
+        const strikes =
+            rows.map(
+                r => r.strike
+            );
+
+
+        const center =
+            strikes[
+                Math.floor(
+                    strikes.length / 2
+                )
+            ];
+
+
+        const distance =
+            range === "near2500"
+                ? 2500
+                : 5000;
+
+
+        rows =
+            rows.filter(
+                r =>
+                    Math.abs(
+                        r.strike -
+                        center
+                    ) <= distance
+            );
+
+    }
+
+
+    /*
+       最大値
+    */
+
+    const maxCallVolume =
+        Math.max(
+            1,
+            ...rows.map(
+                r =>
+                    r.callVolume
+            )
+        );
+
+
+    const maxCallOI =
+        Math.max(
+            1,
+            ...rows.map(
+                r =>
+                    r.callOI
+            )
+        );
+
+
+    const maxPutOI =
+        Math.max(
+            1,
+            ...rows.map(
+                r =>
+                    r.putOI
+            )
+        );
+
+
+    const maxPutVolume =
+        Math.max(
+            1,
+            ...rows.map(
+                r =>
+                    r.putVolume
+            )
+        );
+
+
+    /*
+       合計OI
+    */
+
+    const totalCallOI =
+        rows.reduce(
+            (sum, r) =>
+                sum + r.callOI,
+            0
+        );
+
+
+    const totalPutOI =
+        rows.reduce(
+            (sum, r) =>
+                sum + r.putOI,
+            0
+        );
+
+
+    totalCallOIElement.textContent =
+        formatNumber(
+            totalCallOI
+        );
+
+
+    totalPutOIElement.textContent =
+        formatNumber(
+            totalPutOI
+        );
+
+
+    const ratio =
+        totalPutOI > 0
+            ? totalCallOI /
+              totalPutOI
+            : NaN;
+
+
+    oiRatioElement.textContent =
+        formatRatio(ratio);
+
+
+    /*
+       描画開始
+    */
+
+    chart.innerHTML = "";
+
+
+    rows.forEach(
+        r => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "option-row";
+
+
+            /*
+               バー幅
+            */
+
+            const callVolumeWidth =
                 r.callVolume /
                 maxCallVolume *
-                100
-            );
+                100;
 
 
-        /*
-           CALL OI
-        */
-
-        const callOIWidth =
-            Math.min(
-                100,
+            const callOIWidth =
                 r.callOI /
                 maxCallOI *
-                100
-            );
+                100;
 
 
-        /*
-           PUT OI
-        */
-
-        const putOIWidth =
-            Math.min(
-                100,
+            const putOIWidth =
                 r.putOI /
                 maxPutOI *
-                100
-            );
+                100;
 
 
-        /*
-           PUT Volume
-        */
-
-        const putVolumeWidth =
-            Math.min(
-                100,
+            const putVolumeWidth =
                 r.putVolume /
                 maxPutVolume *
-                100
+                100;
+
+
+            /*
+               100%を超えないようにする
+            */
+
+            const cv =
+                Math.min(
+                    100,
+                    callVolumeWidth
+                );
+
+
+            const coi =
+                Math.min(
+                    100,
+                    callOIWidth
+                );
+
+
+            const poi =
+                Math.min(
+                    100,
+                    putOIWidth
+                );
+
+
+            const pv =
+                Math.min(
+                    100,
+                    putVolumeWidth
+                );
+
+
+            row.innerHTML = `
+
+
+                <!-- CALL Volume -->
+
+                <div
+                    class="
+                        bar-cell
+                        call-volume
+                    "
+                >
+
+                    <div class="bar-area">
+
+                        <div
+                            class="bar"
+                            style="
+                                width:${cv}%;
+                            "
+                        ></div>
+
+                        <div
+                            class="bar-value"
+                        >
+                            ${formatNumber(
+                                r.callVolume
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CALL OI -->
+
+                <div
+                    class="
+                        bar-cell
+                        call-oi
+                    "
+                >
+
+                    <div class="bar-area">
+
+                        <div
+                            class="bar"
+                            style="
+                                width:${coi}%;
+                            "
+                        ></div>
+
+                        <div
+                            class="bar-value"
+                        >
+                            ${formatNumber(
+                                r.callOI
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STRIKE -->
+
+                <div class="strike">
+
+                    ${formatNumber(
+                        r.strike
+                    )}
+
+                </div>
+
+
+                <!-- PUT OI -->
+
+                <div
+                    class="
+                        bar-cell
+                        put-oi
+                    "
+                >
+
+                    <div class="bar-area">
+
+                        <div
+                            class="bar"
+                            style="
+                                width:${poi}%;
+                            "
+                        ></div>
+
+                        <div
+                            class="bar-value"
+                        >
+                            ${formatNumber(
+                                r.putOI
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PUT Volume -->
+
+                <div
+                    class="
+                        bar-cell
+                        put-volume
+                    "
+                >
+
+                    <div class="bar-area">
+
+                        <div
+                            class="bar"
+                            style="
+                                width:${pv}%;
+                            "
+                        ></div>
+
+                        <div
+                            class="bar-value"
+                        >
+                            ${formatNumber(
+                                r.putVolume
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            chart.appendChild(
+                row
             );
 
+        }
+    );
 
-        row.innerHTML = `
-
-            <!-- CALL Volume -->
-
-            <div class="bar-cell call-volume">
-
-                <div class="bar-area">
-
-                    <div
-                        class="bar"
-                        style="
-                            width:${callVolumeWidth}%;
-                        ">
-                    </div>
-
-                    <div class="bar-value">
-                        ${formatNumber(r.callVolume)}
-                    </div>
-
-                </div>
-
-            </div>
+}
 
 
-            <!-- CALL OI -->
+/* =========================================================
+   Escape HTML
+========================================================= */
 
-            <div class="bar-cell call-oi">
+function escapeHTML(
+    value
+) {
 
-                <div class="bar-area">
-
-                    <div
-                        class="bar"
-                        style="
-                            width:${callOIWidth}%;
-                        ">
-                    </div>
-
-                    <div class="bar-value">
-                        ${formatNumber(r.callOI)}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Strike -->
-
-            <div
-                class="
-                    strike
-                    ${isCurrent
-                        ? "current-price"
-                        : ""}
-                "
-            >
-
-                ${formatNumber(r.strike)}
-
-                ${
-                    isCurrent
-                        ? `<span class="current-label">
-                            現在値
-                           </span>`
-                        : ""
-                }
-
-            </div>
-
-
-            <!-- PUT OI -->
-
-            <div class="bar-cell put-oi">
-
-                <div class="bar-area">
-
-                    <div
-                        class="bar"
-                        style="
-                            width:${putOIWidth}%;
-                        ">
-                    </div>
-
-                    <div class="bar-value">
-                        ${formatNumber(r.putOI)}
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- PUT Volume -->
-
-            <div class="bar-cell put-volume">
-
-                <div class="bar-area">
-
-                    <div
-                        class="bar"
-                        style="
-                            width:${putVolumeWidth}%;
-                        ">
-                    </div>
-
-                    <div class="bar-value">
-                        ${formatNumber(r.putVolume)}
-                    </div>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        chart.appendChild(row);
-
-    });
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
@@ -1439,11 +2293,15 @@ reloadButton.addEventListener(
 
 
 /* =========================================================
-   Auto reload
+   Automatic reload
 ========================================================= */
 
 setInterval(
-    loadData,
+    () => {
+
+        loadData();
+
+    },
     60 * 1000
 );
 
@@ -1455,6 +2313,7 @@ setInterval(
 loadData();
 
 </script>
+
 
 </body>
 </html>
