@@ -1,0 +1,261 @@
+name: Update JPX Option Data
+
+on:
+
+  workflow_dispatch:
+
+  schedule:
+    # 5分間隔
+    # GitHub Actionsは多少遅延することがあります
+    - cron: "2-57/5 * * * 1-5"
+
+
+# ======================================================
+# 同時実行防止
+# ======================================================
+
+concurrency:
+  group: jpx-option-data-update
+  cancel-in-progress: false
+
+
+# ======================================================
+# Permissions
+# ======================================================
+
+permissions:
+  contents: write
+
+
+jobs:
+
+  update-option-data:
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+      # ==================================================
+      # Checkout
+      # ==================================================
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+        with:
+          fetch-depth: 0
+
+
+      # ==================================================
+      # Python
+      # ==================================================
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.12"
+
+
+      # ==================================================
+      # Dependencies
+      # ==================================================
+
+      - name: Install dependencies
+        run: |
+
+          python -m pip install --upgrade pip
+
+          pip install requests beautifulsoup4
+
+
+      # ==================================================
+      # Get JPX option data
+      # ==================================================
+
+      - name: Get JPX option data
+        run: |
+
+          echo "========================================"
+          echo "GET JPX OPTION DATA"
+          echo "========================================"
+
+          python get_option_data.py
+
+
+      # ==================================================
+      # Calculate differences + Discord
+      # ==================================================
+
+      - name: Calculate differences and send Discord
+        env:
+
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+        run: |
+
+          echo "========================================"
+          echo "CALCULATE DIFFERENCES"
+          echo "========================================"
+
+          python calculate_difference.py
+
+
+      # ==================================================
+      # Check files
+      # ==================================================
+
+      - name: Check data files
+        run: |
+
+          echo "========================================"
+          echo "DATA FILES"
+          echo "========================================"
+
+          find data -maxdepth 2 -type f -print | sort
+
+          echo ""
+
+          echo "========================================"
+          echo "GIT STATUS"
+          echo "========================================"
+
+          git status --short
+
+
+      # ==================================================
+      # Commit and push
+      # ==================================================
+
+      - name: Commit and push
+        run: |
+
+          echo "========================================"
+          echo "COMMIT AND PUSH"
+          echo "========================================"
+
+
+          # ----------------------------------------------
+          # Git settings
+          # ----------------------------------------------
+
+          git config user.name \
+            "github-actions[bot]"
+
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+
+          # ----------------------------------------------
+          # Add data files
+          # ----------------------------------------------
+
+          git add data/
+
+
+          # ----------------------------------------------
+          # Check changes
+          # ----------------------------------------------
+
+          if git diff --cached --quiet; then
+
+            echo ""
+            echo "No changes to commit."
+            echo ""
+
+          else
+
+            echo ""
+            echo "Changes detected."
+            echo ""
+
+            git status --short
+
+            echo ""
+
+
+            # --------------------------------------------
+            # Commit
+            # --------------------------------------------
+
+            git commit \
+              -m "Update JPX option data"
+
+
+            # --------------------------------------------
+            # Get latest remote main
+            # --------------------------------------------
+
+            echo ""
+            echo "Fetching latest main..."
+            echo ""
+
+            git fetch origin main
+
+
+            # --------------------------------------------
+            # Rebase local commit onto latest main
+            # --------------------------------------------
+
+            echo ""
+            echo "Rebasing onto origin/main..."
+            echo ""
+
+            git rebase origin/main
+
+
+            # --------------------------------------------
+            # Push
+            # --------------------------------------------
+
+            echo ""
+            echo "Pushing to main..."
+            echo ""
+
+            git push origin HEAD:main
+
+            echo ""
+            echo "Push completed."
+            echo ""
+
+          fi
+
+
+      # ==================================================
+      # Finish
+      # ==================================================
+
+      - name: Finished
+        run: |
+
+          echo ""
+          echo "========================================"
+          echo "JPX OPTION DATA UPDATE FINISHED"
+          echo "========================================"
+
+          echo "Time:"
+          date
+
+          echo ""
+
+          echo "Repository:"
+          echo "${GITHUB_REPOSITORY}"
+
+          echo ""
+
+          echo "Branch:"
+          echo "${GITHUB_REF_NAME}"
+
+          echo ""
+
+          echo "Workflow:"
+          echo "${GITHUB_WORKFLOW}"
+
+          echo ""
+
+          echo "Run:"
+          echo "${GITHUB_RUN_NUMBER}"
+
+          echo ""
+          echo "========================================"
