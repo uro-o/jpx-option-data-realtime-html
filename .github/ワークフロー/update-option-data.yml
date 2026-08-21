@@ -5,23 +5,17 @@ on:
   workflow_dispatch:
 
   schedule:
-    # 5分間隔
-    # GitHub Actionsは多少遅延することがあります
-    - cron: "2-57/5 * * * 1-5"
+    - cron: "*/5 * * * 1-5"
 
 
-# ======================================================
-# 同時実行防止
-# ======================================================
+# ============================================================
+# 同じWorkflowを同時実行させない
+# ============================================================
 
 concurrency:
-  group: jpx-option-data-update
+  group: jpx-option-data
   cancel-in-progress: false
 
-
-# ======================================================
-# Permissions
-# ======================================================
 
 permissions:
   contents: write
@@ -36,9 +30,9 @@ jobs:
 
     steps:
 
-      # ==================================================
+      # ======================================================
       # Checkout
-      # ==================================================
+      # ======================================================
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,9 +41,9 @@ jobs:
           fetch-depth: 0
 
 
-      # ==================================================
+      # ======================================================
       # Python
-      # ==================================================
+      # ======================================================
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -58,9 +52,9 @@ jobs:
           python-version: "3.12"
 
 
-      # ==================================================
+      # ======================================================
       # Dependencies
-      # ==================================================
+      # ======================================================
 
       - name: Install dependencies
         run: |
@@ -70,9 +64,9 @@ jobs:
           pip install requests beautifulsoup4
 
 
-      # ==================================================
-      # Get JPX option data
-      # ==================================================
+      # ======================================================
+      # Get JPX data
+      # ======================================================
 
       - name: Get JPX option data
         run: |
@@ -84,9 +78,9 @@ jobs:
           python get_option_data.py
 
 
-      # ==================================================
+      # ======================================================
       # Calculate differences + Discord
-      # ==================================================
+      # ======================================================
 
       - name: Calculate differences and send Discord
         env:
@@ -102,9 +96,9 @@ jobs:
           python calculate_difference.py
 
 
-      # ==================================================
+      # ======================================================
       # Check files
-      # ==================================================
+      # ======================================================
 
       - name: Check data files
         run: |
@@ -124,9 +118,9 @@ jobs:
           git status --short
 
 
-      # ==================================================
+      # ======================================================
       # Commit and push
-      # ==================================================
+      # ======================================================
 
       - name: Commit and push
         run: |
@@ -136,10 +130,6 @@ jobs:
           echo "========================================"
 
 
-          # ----------------------------------------------
-          # Git settings
-          # ----------------------------------------------
-
           git config user.name \
             "github-actions[bot]"
 
@@ -147,16 +137,8 @@ jobs:
             "41898282+github-actions[bot]@users.noreply.github.com"
 
 
-          # ----------------------------------------------
-          # Add data files
-          # ----------------------------------------------
-
           git add data/
 
-
-          # ----------------------------------------------
-          # Check changes
-          # ----------------------------------------------
 
           if git diff --cached --quiet; then
 
@@ -175,17 +157,9 @@ jobs:
             echo ""
 
 
-            # --------------------------------------------
-            # Commit
-            # --------------------------------------------
-
             git commit \
               -m "Update JPX option data"
 
-
-            # --------------------------------------------
-            # Get latest remote main
-            # --------------------------------------------
 
             echo ""
             echo "Fetching latest main..."
@@ -194,26 +168,61 @@ jobs:
             git fetch origin main
 
 
-            # --------------------------------------------
-            # Rebase local commit onto latest main
-            # --------------------------------------------
-
             echo ""
-            echo "Rebasing onto origin/main..."
+            echo "Checking remote changes..."
             echo ""
 
-            git rebase origin/main
+
+            # ------------------------------------------------
+            # リモートに新しいコミットがある場合
+            #
+            # データファイルは今回取得したものを優先
+            # ------------------------------------------------
+
+            if git merge-base --is-ancestor HEAD origin/main; then
+
+              echo "Remote is already up to date."
+
+            else
+
+              echo "Remote has newer commits."
+
+              echo "Resetting to remote main..."
+
+              git reset --soft origin/main
+
+              echo ""
+
+              echo "Restaging data..."
+
+              git add data/
 
 
-            # --------------------------------------------
-            # Push
-            # --------------------------------------------
+              if git diff --cached --quiet; then
+
+                echo ""
+                echo "No local data changes after sync."
+                echo ""
+
+              else
+
+                echo ""
+                echo "Creating combined commit..."
+
+                git commit \
+                  -m "Update JPX option data"
+
+              fi
+
+            fi
+
 
             echo ""
             echo "Pushing to main..."
             echo ""
 
             git push origin HEAD:main
+
 
             echo ""
             echo "Push completed."
@@ -222,40 +231,39 @@ jobs:
           fi
 
 
-      # ==================================================
+      # ======================================================
       # Finish
-      # ==================================================
+      # ======================================================
 
       - name: Finished
         run: |
 
           echo ""
-          echo "========================================"
-          echo "JPX OPTION DATA UPDATE FINISHED"
+
           echo "========================================"
 
+          echo "JPX OPTION DATA UPDATE FINISHED"
+
+          echo "========================================"
+
+          echo ""
+
           echo "Time:"
+
           date
 
           echo ""
 
           echo "Repository:"
+
           echo "${GITHUB_REPOSITORY}"
 
           echo ""
 
           echo "Branch:"
+
           echo "${GITHUB_REF_NAME}"
 
           echo ""
 
-          echo "Workflow:"
-          echo "${GITHUB_WORKFLOW}"
-
-          echo ""
-
-          echo "Run:"
-          echo "${GITHUB_RUN_NUMBER}"
-
-          echo ""
           echo "========================================"
