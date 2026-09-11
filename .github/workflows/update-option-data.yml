@@ -39,111 +39,14 @@ jobs:
           echo "========================================"
           echo "GET JPX OPTION DATA"
           echo "========================================"
-          python get_option_data.py
-
-      - name: Remove expired option contracts
-        run: |
-          echo "========================================"
-          echo "REMOVE EXPIRED OPTION CONTRACTS"
-          echo "========================================"
-
-          python - <<'PY'
-          import csv
-          import re
-          import calendar
-          from datetime import date, timedelta, timezone, datetime
-          from pathlib import Path
-
-          path = Path("data/latest.csv")
-          JST = timezone(timedelta(hours=9))
-          today = datetime.now(JST).date()
-
-          def last_trading_day(contract):
-              # Do not trust QRI's last_trading_day field here.
-              # Some QRI pages can show an incorrect value for an expired month.
-              m = re.fullmatch(r"(\d{4})-(\d{1,2})", str(contract).strip())
-              if not m:
-                  return None
-
-              year = int(m.group(1))
-              month = int(m.group(2))
-              if not 1 <= month <= 12:
-                  return None
-
-              cal = calendar.monthcalendar(year, month)
-              fridays = [
-                  week[calendar.FRIDAY]
-                  for week in cal
-                  if week[calendar.FRIDAY]
-              ]
-
-              if len(fridays) < 2:
-                  return None
-
-              # Monthly Nikkei 225 options: SQ is the second Friday.
-              sq_day = date(year, month, fridays[1])
-
-              # Trading ends on the business day immediately before SQ.
-              last_day = sq_day - timedelta(days=1)
-              while last_day.weekday() >= 5:
-                  last_day -= timedelta(days=1)
-
-              return last_day
-
-          if not path.exists():
-              print("latest.csv not found")
-              raise SystemExit(0)
-
-          with path.open("r", encoding="utf-8-sig", newline="") as f:
-              reader = csv.DictReader(f)
-              fieldnames = reader.fieldnames or []
-              rows = list(reader)
-
-          active_rows = []
-          removed_contracts = set()
-
-          for row in rows:
-              contract = (row.get("contract") or "").strip()
-              expiry = last_trading_day(contract)
-
-              if expiry is not None and expiry < today:
-                  removed_contracts.add(contract)
-                  continue
-
-              active_rows.append(row)
-
-          if removed_contracts:
-              with path.open("w", encoding="utf-8-sig", newline="") as f:
-                  writer = csv.DictWriter(f, fieldnames=fieldnames)
-                  writer.writeheader()
-                  writer.writerows(active_rows)
-
-              print(f"Today (JST): {today}")
-              print("Removed expired contracts:")
-              for contract in sorted(removed_contracts):
-                  print(f"  - {contract} (last trading day: {last_trading_day(contract)})")
-          else:
-              print(f"Today (JST): {today}")
-              print("No expired contracts found.")
-
-          print(f"Remaining records: {len(active_rows)}")
-          PY
-
-      - name: Calculate differences and send Discord
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          echo "========================================"
-          echo "CALCULATE DIFFERENCES"
-          echo "========================================"
-          python calculate_difference.py
+          python run_option_data.py
 
       - name: Check data files
         run: |
           echo "========================================"
           echo "DATA FILES"
           echo "========================================"
-          find data -maxdepth 2 -type f -print | sort
+          find data -maxdepth 3 -type f -print | sort
           echo ""
           echo "========================================"
           echo "GIT STATUS"
