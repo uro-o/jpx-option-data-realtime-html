@@ -59,20 +59,32 @@ jobs:
           today = datetime.now(JST).date()
 
           def last_trading_day(contract):
-              m = re.fullmatch(r"(\\d{4})-(\\d{2})", str(contract).strip())
+              # Do not trust QRI's last_trading_day field here.
+              # Some QRI pages can show an incorrect value for an expired month.
+              m = re.fullmatch(r"(\d{4})-(\d{1,2})", str(contract).strip())
               if not m:
                   return None
 
               year = int(m.group(1))
               month = int(m.group(2))
+              if not 1 <= month <= 12:
+                  return None
+
               cal = calendar.monthcalendar(year, month)
-              fridays = [week[calendar.FRIDAY] for week in cal if week[calendar.FRIDAY]]
+              fridays = [
+                  week[calendar.FRIDAY]
+                  for week in cal
+                  if week[calendar.FRIDAY]
+              ]
+
               if len(fridays) < 2:
                   return None
 
+              # Monthly Nikkei 225 options: SQ is the second Friday.
               sq_day = date(year, month, fridays[1])
-              last_day = sq_day - timedelta(days=1)
 
+              # Trading ends on the business day immediately before SQ.
+              last_day = sq_day - timedelta(days=1)
               while last_day.weekday() >= 5:
                   last_day -= timedelta(days=1)
 
@@ -109,7 +121,7 @@ jobs:
               print(f"Today (JST): {today}")
               print("Removed expired contracts:")
               for contract in sorted(removed_contracts):
-                  print(f"  - {contract} (expired)")
+                  print(f"  - {contract} (last trading day: {last_trading_day(contract)})")
           else:
               print(f"Today (JST): {today}")
               print("No expired contracts found.")
