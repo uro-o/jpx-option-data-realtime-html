@@ -8,7 +8,7 @@
 
 ```text
 jpx-option-data-realtime-html/
-├── .github/
+├── .gitignore\n├── .github/
 │   └── workflows/
 │       └── update-option-data.yml
 ├── data/
@@ -59,7 +59,7 @@ GitHub Actionsから実行される入口です。
 - QRIページのHTTP取得
 - BeautifulSoupによるHTML解析
 - 限月情報・取引日・SQ日・QRI更新時刻の取得
-- CALL/PUTのオプション行の抽出
+- CALL/PUTのオプション行の抽出\n- 3限月すべての取得完了、各StrikeのCALL/PUTペア、重複行、想定外限月の検証\n- 検証成功後にのみ差分・最新CSV・履歴の更新へ進む\n- `latest.csv` を一時ファイル経由で安全に置換
 - `latest.csv` の読み込みと保存
 - 前回取得データとの比較
 - `differences.csv` の生成
@@ -153,7 +153,7 @@ GitHub Pagesで公開する画面です。
 
 - cron：`*/5 * * * 1-5`（UTC）
 - 手動起動：workflow_dispatch
-- push起動：`run_option_data.py` の変更時
+- push起動：workflow自身、`run_option_data.py`、`get_option_data.py`、`tests/**` の変更時
 - Python：3.12
 - インストール：requests、beautifulsoup4
 - 実行：`python run_option_data.py`
@@ -162,7 +162,7 @@ GitHub Pagesで公開する画面です。
 
 注意：
 - GitHub ActionsのcronはUTCです。日本時間に換算すると+9時間です。
-- 現状、`get_option_data.py` 等の変更だけではpushトリガーは起動しません。定期実行または手動実行で確認する必要があります。
+- `get_option_data.py` とテストファイルの変更でもpushトリガーが起動します。
 - workflow本文では `DISCORD_WEBHOOK_URL` を環境変数に渡す設定が確認できていません。
 - 実行時間上限（timeout-minutes）は明示されていません。
 
