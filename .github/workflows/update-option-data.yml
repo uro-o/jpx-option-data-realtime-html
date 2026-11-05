@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - "run_option_data.py"
+      - "get_option_data.py"
+      - "tests/**"
 
   workflow_dispatch:
 
