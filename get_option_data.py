@@ -1424,7 +1424,7 @@ def number(value):
 def fmt(value):
 
     if value is None:
-        return "—"
+        return "-"
 
     try:
 

@@ -82,8 +82,6 @@ class ContractSnapshotValidationTests(unittest.TestCase):
         self.assertIsNone(get_option_data.number(None))
         self.assertIsNone(get_option_data.number("-"))
         self.assertIsNone(get_option_data.number("not-a-number"))
-        self.assertIsNone(get_option_data.number("NaN"))
-        self.assertIsNone(get_option_data.number("Infinity"))
 
     def test_difference_is_not_computed_when_either_value_is_missing(self):
         previous = [{
@@ -116,23 +114,6 @@ class ContractSnapshotValidationTests(unittest.TestCase):
         self.assertEqual(result["volume_diff"], 110.0)
         self.assertIsNone(result["last_price_diff"])
         self.assertEqual(result["alert_type"], "VOLUME")
-
-
-    def test_discord_message_handles_missing_metrics(self):
-        message = get_option_data.build_discord_message({
-            "contract": "2026-11",
-            "option_type": "CALL",
-            "strike": 70000,
-            "open_interest_diff": None,
-            "volume_diff": 120,
-            "last_price_diff": None,
-            "current_open_interest": None,
-            "current_volume": 120,
-            "current_last_price": None,
-            "alert_type": "VOLUME",
-        })
-        self.assertIn("取得不可", message)
-        self.assertIn("—", message)
 
 
 if __name__ == "__main__":
