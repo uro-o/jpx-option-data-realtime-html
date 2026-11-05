@@ -4,6 +4,7 @@ on:
 
   push:
     paths:
+      - ".github/workflows/update-option-data.yml"
       - "run_option_data.py"
       - "get_option_data.py"
       - "tests/**"
