@@ -1398,25 +1398,21 @@ def save_history(
 # ============================================================
 
 def number(value):
-
+    """
+    Convert a CSV value to float while preserving missing values as None.
+    Numeric zero remains 0; blank or invalid values are never coerced to zero.
+    """
     if value is None:
-        return 0
+        return None
 
-    if value == "":
-        return 0
+    text = str(value).strip()
+    if text in ("", "-", "--", "－", "―", "—"):
+        return None
 
     try:
-
-        return float(
-            str(value).replace(
-                ",",
-                ""
-            )
-        )
-
-    except Exception:
-
-        return 0
+        return float(text.replace(",", ""))
+    except (TypeError, ValueError):
+        return None
 
 
 # ============================================================
@@ -1520,89 +1516,51 @@ def calculate_differences(
         if previous is None:
             continue
 
-        previous_oi = number(
-            previous.get(
-                "open_interest"
-            )
-        )
+        previous_oi = number(previous.get("open_interest"))
+        current_oi = number(current.get("open_interest"))
 
-        current_oi = number(
-            current.get(
-                "open_interest"
-            )
-        )
+        previous_volume = number(previous.get("volume"))
+        current_volume = number(current.get("volume"))
 
-        previous_volume = number(
-            previous.get(
-                "volume"
-            )
-        )
+        previous_price = number(previous.get("last_price"))
+        current_price = number(current.get("last_price"))
 
-        current_volume = number(
-            current.get(
-                "volume"
-            )
-        )
+        previous_ask_qty = number(previous.get("ask_quantity"))
+        current_ask_qty = number(current.get("ask_quantity"))
 
-        previous_price = number(
-            previous.get(
-                "last_price"
-            )
-        )
+        previous_bid_qty = number(previous.get("bid_quantity"))
+        current_bid_qty = number(current.get("bid_quantity"))
 
-        current_price = number(
-            current.get(
-                "last_price"
-            )
-        )
-
-        previous_ask_qty = number(
-            previous.get(
-                "ask_quantity"
-            )
-        )
-
-        current_ask_qty = number(
-            current.get(
-                "ask_quantity"
-            )
-        )
-
-        previous_bid_qty = number(
-            previous.get(
-                "bid_quantity"
-            )
-        )
-
-        current_bid_qty = number(
-            current.get(
-                "bid_quantity"
-            )
-        )
-
+        # A difference is meaningful only when both snapshots contain
+        # a valid numeric value. Missing values remain None.
         oi_diff = (
-            current_oi -
-            previous_oi
+            current_oi - previous_oi
+            if current_oi is not None and previous_oi is not None
+            else None
         )
 
         volume_diff = (
-            current_volume -
-            previous_volume
+            current_volume - previous_volume
+            if current_volume is not None and previous_volume is not None
+            else None
         )
 
         price_diff = (
-            current_price -
-            previous_price
+            current_price - previous_price
+            if current_price is not None and previous_price is not None
+            else None
         )
 
         ask_qty_diff = (
-            current_ask_qty -
-            previous_ask_qty
+            current_ask_qty - previous_ask_qty
+            if current_ask_qty is not None and previous_ask_qty is not None
+            else None
         )
 
         bid_qty_diff = (
-            current_bid_qty -
-            previous_bid_qty
+            current_bid_qty - previous_bid_qty
+            if current_bid_qty is not None and previous_bid_qty is not None
+            else None
         )
 
         alerts = []
@@ -1612,8 +1570,8 @@ def calculate_differences(
         # ====================================================
 
         if (
-            volume_diff
-            >= VOLUME_THRESHOLD
+            volume_diff is not None
+            and volume_diff >= VOLUME_THRESHOLD
         ):
 
             alerts.append(
@@ -1625,8 +1583,8 @@ def calculate_differences(
         # ====================================================
 
         if (
-            oi_diff
-            >= OI_INCREASE_THRESHOLD
+            oi_diff is not None
+            and oi_diff >= OI_INCREASE_THRESHOLD
         ):
 
             alerts.append(
@@ -1638,8 +1596,8 @@ def calculate_differences(
         # ====================================================
 
         if (
-            oi_diff
-            <= -OI_DECREASE_THRESHOLD
+            oi_diff is not None
+            and oi_diff <= -OI_DECREASE_THRESHOLD
         ):
 
             alerts.append(
@@ -1651,8 +1609,8 @@ def calculate_differences(
         # ====================================================
 
         if (
-            abs(price_diff)
-            >= PRICE_CHANGE_THRESHOLD
+            price_diff is not None
+            and abs(price_diff) >= PRICE_CHANGE_THRESHOLD
         ):
 
             alerts.append(
@@ -1946,40 +1904,31 @@ def build_discord_message(
     # Direction
     # ========================================================
 
-    if oi_diff > 0:
-
+    if oi_diff is None:
+        oi_direction = "取得不可"
+    elif oi_diff > 0:
         oi_direction = "増加"
-
     elif oi_diff < 0:
-
         oi_direction = "減少"
-
     else:
-
         oi_direction = "変化なし"
 
-    if volume_diff > 0:
-
+    if volume_diff is None:
+        volume_direction = "取得不可"
+    elif volume_diff > 0:
         volume_direction = "増加"
-
     elif volume_diff < 0:
-
         volume_direction = "減少"
-
     else:
-
         volume_direction = "変化なし"
 
-    if price_diff > 0:
-
+    if price_diff is None:
+        price_direction = "取得不可"
+    elif price_diff > 0:
         price_direction = "上昇"
-
     elif price_diff < 0:
-
         price_direction = "下落"
-
     else:
-
         price_direction = "変化なし"
 
     # ========================================================
