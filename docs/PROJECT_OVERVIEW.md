@@ -8,7 +8,8 @@
 
 ```text
 jpx-option-data-realtime-html/
-├── .gitignore\n├── .github/
+├── .gitignore
+├── .github/
 │   └── workflows/
 │       └── update-option-data.yml
 ├── data/
@@ -21,7 +22,13 @@ jpx-option-data-realtime-html/
 │       └── YYYY-MM/
 │           └── YYYY-MM-DD.csv
 ├── docs/
-│   └── index.html
+│   ├── index.html
+│   ├── PROJECT_OVERVIEW.md
+│   ├── OPERATIONS.md
+│   ├── DATA_DICTIONARY.md
+│   └── IMPROVEMENT_BACKLOG.md
+├── tests/
+│   └── test_data_validation.py
 ├── run_option_data.py
 ├── get_option_data.py
 ├── calculate_difference.py
@@ -59,7 +66,10 @@ GitHub Actionsから実行される入口です。
 - QRIページのHTTP取得
 - BeautifulSoupによるHTML解析
 - 限月情報・取引日・SQ日・QRI更新時刻の取得
-- CALL/PUTのオプション行の抽出\n- 3限月すべての取得完了、各StrikeのCALL/PUTペア、重複行、想定外限月の検証\n- 検証成功後にのみ差分・最新CSV・履歴の更新へ進む\n- `latest.csv` を一時ファイル経由で安全に置換
+- CALL/PUTのオプション行の抽出
+- 3限月すべての取得完了、各StrikeのCALL/PUTペア、重複行、想定外限月の検証
+- 検証成功後にのみ差分・最新CSV・履歴の更新へ進む
+- `latest.csv` を一時ファイル経由で安全に置換
 - `latest.csv` の読み込みと保存
 - 前回取得データとの比較
 - `differences.csv` の生成
