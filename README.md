@@ -79,7 +79,7 @@ GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません�
 - Discord送信失敗後も最新CSVが更新されるため、通知を再送できない可能性があります。
 - `calculate_difference.py`、`detect_large_trades.py`、`notify_discord.py` は独立スクリプトであり、現在のActionsワークフローからは呼び出されていません。
 - HTMLの現在値欄には現状、価格を設定する取得処理がありません。
-- HTMLでは欠損値を「—」で表示し、欠損OIが1つでもある限月ではMax Pain・OI合計・OI比率を計算しません。Strike全体の欠落検知は今後の改善課題です。
+- HTMLではStrikeごとのCALL/PUTペア、重複行、不正行、OI欠損を検査します。ペアまたはOIが不完全ならMax Pain・OI合計・OI比率を更新せず、取得件数・OI取得率を表示します。ただし、CALL/PUT両方の行が同じStrikeで丸ごと欠けた場合は、QRI側の期待Strike一覧がないため検知できません。
 - `requirements.txt` はまだありません。データ完全性・欠損値・差分計算の自動テストを `tests/test_data_validation.py` に追加し、Actionsで毎回実行します。
 
 改善の優先順位は[改善課題一覧](docs/IMPROVEMENT_BACKLOG.md)を参照してください。
@@ -96,4 +96,4 @@ GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません�
 
 ## ドキュメント更新履歴
 
-- 2026-11-05：コードとデータ構成を確認し、READMEおよび運用・構成・データ項目・改善課題の文書を追加。
+- 2026-11-05：コードとデータ構成を確認し、READMEおよび運用・構成・データ項目・改善課題の文書を追加。Max PainのCALL/PUTペア・重複・OI取得率チェックとHTMLテストを追加。
