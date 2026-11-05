@@ -1088,6 +1088,106 @@ def load_csv(path):
 
 
 # ============================================================
+# Validate complete contract snapshots
+# ============================================================
+
+def validate_contract_records(records, expected_contracts):
+    """
+    Reject partial or structurally inconsistent QRI snapshots.
+
+    Each expected contract must contain at least one strike, with exactly
+    one CALL and one PUT record for every strike. A validation failure is
+    raised before differences, latest.csv, or history are written.
+    """
+    expected = list(expected_contracts)
+
+    if len(expected) != 3 or len(set(expected)) != 3:
+        raise RuntimeError(
+            f"Expected exactly 3 distinct contracts, got: {expected}"
+        )
+
+    grouped = {contract: [] for contract in expected}
+    unexpected = set()
+
+    for record in records:
+        contract = str(record.get("contract") or "").strip()
+        if contract not in grouped:
+            unexpected.add(contract or "<blank>")
+            continue
+        grouped[contract].append(record)
+
+    problems = []
+
+    if unexpected:
+        problems.append(
+            f"unexpected contract keys: {sorted(unexpected)}"
+        )
+
+    for contract in expected:
+        contract_records = grouped[contract]
+        if not contract_records:
+            problems.append(f"{contract}: no records")
+            continue
+
+        strikes = {}
+        seen = set()
+
+        for record in contract_records:
+            option_type = str(
+                record.get("option_type") or ""
+            ).strip().upper()
+            strike = record.get("strike")
+
+            if option_type not in ("CALL", "PUT"):
+                problems.append(
+                    f"{contract}: invalid option_type={option_type!r}"
+                )
+                continue
+
+            if strike is None or str(strike).strip() == "":
+                problems.append(
+                    f"{contract}: blank strike for {option_type}"
+                )
+                continue
+
+            key = (option_type, str(strike).strip())
+            if key in seen:
+                problems.append(
+                    f"{contract}: duplicate {option_type} strike={strike}"
+                )
+                continue
+
+            seen.add(key)
+            strikes.setdefault(str(strike).strip(), set()).add(option_type)
+
+        for strike, option_types in strikes.items():
+            if option_types != {"CALL", "PUT"}:
+                missing = sorted({"CALL", "PUT"} - option_types)
+                problems.append(
+                    f"{contract}: strike={strike} missing {missing}"
+                )
+
+        if strikes:
+            print(
+                f"[VALIDATION] {contract}: "
+                f"records={len(contract_records)} "
+                f"strikes={len(strikes)} "
+                f"CALL/PUT pairs={sum(1 for v in strikes.values() if v == {'CALL', 'PUT'})}"
+            )
+
+    if problems:
+        detail = "\n - ".join(problems)
+        raise RuntimeError(
+            "QRI snapshot validation failed; existing data files were "
+            "left unchanged:\n - " + detail
+        )
+
+    print(
+        "[VALIDATION] All 3 contracts contain complete CALL/PUT strike pairs."
+    )
+
+
+# ============================================================
 # Save latest
 # ============================================================
 
@@ -1099,20 +1199,38 @@ def save_latest(records):
             "Cannot save empty latest.csv"
         )
 
-    with open(
-        LATEST_FILE,
-        "w",
-        encoding="utf-8-sig",
-        newline="",
-    ) as f:
+    # Write beside the destination and atomically replace it only after
+    # the complete CSV has been flushed successfully.
+    temporary_file = LATEST_FILE.with_name(
+        LATEST_FILE.name + ".tmp"
+    )
 
-        writer = csv.DictWriter(
-            f,
-            fieldnames=FIELDNAMES,
+    try:
+        with open(
+            temporary_file,
+            "w",
+            encoding="utf-8-sig",
+            newline="",
+        ) as f:
+
+            writer = csv.DictWriter(
+                f,
+                fieldnames=FIELDNAMES,
+            )
+
+            writer.writeheader()
+            writer.writerows(records)
+            f.flush()
+            os.fsync(f.fileno())
+
+        os.replace(
+            temporary_file,
+            LATEST_FILE,
         )
 
-        writer.writeheader()
-        writer.writerows(records)
+    finally:
+        if temporary_file.exists():
+            temporary_file.unlink()
 
     print(
         f"[LATEST] "
@@ -2131,6 +2249,12 @@ def main():
     all_records = []
 
     contract_update_times = {}
+    failed_contracts = []
+
+    if len(CONTRACTS) != 3 or len(set(CONTRACTS)) != 3:
+        raise RuntimeError(
+            f"Expected exactly 3 distinct contracts, got: {list(CONTRACTS)}"
+        )
 
     for contract, url in CONTRACTS.items():
 
@@ -2155,20 +2279,34 @@ def main():
 
         except Exception as e:
 
+            failed_contracts.append(contract)
+
             print(
                 f"[ERROR] "
                 f"{contract}: {e}"
             )
 
     # ========================================================
-    # Data validation
+    # Data validation — must pass before any output is changed
     # ========================================================
 
-    if not all_records:
-
+    if failed_contracts:
         raise RuntimeError(
-            "No option data collected."
+            "Incomplete QRI snapshot. Failed contracts: "
+            + ", ".join(failed_contracts)
+            + ". Existing latest.csv, differences.csv, and history "
+              "were not updated."
         )
+
+    if not all_records:
+        raise RuntimeError(
+            "No option data collected. Existing data files were not updated."
+        )
+
+    validate_contract_records(
+        all_records,
+        CONTRACTS.keys(),
+    )
 
     print()
     print(
