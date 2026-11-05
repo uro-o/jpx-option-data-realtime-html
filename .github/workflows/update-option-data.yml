@@ -2,6 +2,10 @@ name: Update JPX Option Data
 
 on:
 
+  push:
+    paths:
+      - "run_option_data.py"
+
   workflow_dispatch:
 
   schedule:
