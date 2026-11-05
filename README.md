@@ -37,7 +37,7 @@ QRIが公開する日経225オプション情報を定期取得し、限月・CA
 | `detect_large_trades.py` | `differences.csv` を使う独立した大口変動検出処理 |
 | `notify_discord.py` | `differences.csv` を使う独立した通知・重複通知管理処理 |
 | `docs/index.html` | GitHub Pages用のモニター画面 |
-| `tests/test_data_validation.py` | 3限月の完全性・重複・CALL/PUTペア検証テスト |
+| `tests/test_data_validation.py` | Python取得検証とHTML側Max Pain品質判定のテスト |
 | `data/latest.csv` | 最新取得データ |
 | `data/differences.csv` | 現行取得処理が生成する前回比較データ |
 | `data/history/` | 限月・取引日別の履歴CSVと保存済みマーカー |
