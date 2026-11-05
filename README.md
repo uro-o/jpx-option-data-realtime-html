@@ -74,13 +74,13 @@ GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません�
 ## 現在確認されている注意点
 
 - 3限月すべての取得成功と、各StrikeのCALL/PUTペアを検証してから出力を更新します。取得失敗・欠損・重複があれば処理をエラー終了し、既存の最新CSV等を保持します。
-- 数値変換関数が空欄を0として扱うため、未取得と実際のゼロが混同されます。
+- Pythonの数値変換とHTML表示で、空欄・ハイフン等を欠損値として扱い、数値0と区別します。差分は前回・今回の両方が有効な数値の場合だけ計算します。
 - 差分キーに取引日が含まれず、取引日切替時の出来高差分に注意が必要です。
 - Discord送信失敗後も最新CSVが更新されるため、通知を再送できない可能性があります。
 - `calculate_difference.py`、`detect_large_trades.py`、`notify_discord.py` は独立スクリプトであり、現在のActionsワークフローからは呼び出されていません。
 - HTMLの現在値欄には現状、価格を設定する取得処理がありません。
-- HTML側の数値変換も空欄を0として扱います。Max PainはOIの完全性を検証してから計算する必要があります。
-- `requirements.txt` はまだありません。データ完全性検証の自動テストを `tests/test_data_validation.py` に追加しました。
+- HTMLでは欠損値を「—」で表示し、欠損OIが1つでもある限月ではMax Pain・OI合計・OI比率を計算しません。Strike全体の欠落検知は今後の改善課題です。
+- `requirements.txt` はまだありません。データ完全性・欠損値・差分計算の自動テストを `tests/test_data_validation.py` に追加し、Actionsで毎回実行します。
 
 改善の優先順位は[改善課題一覧](docs/IMPROVEMENT_BACKLOG.md)を参照してください。
 
