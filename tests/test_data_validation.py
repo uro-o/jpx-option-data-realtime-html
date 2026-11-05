@@ -1,3 +1,7 @@
+import json
+import pathlib
+import shutil
+import subprocess
 import unittest
 
 import get_option_data
@@ -169,6 +173,126 @@ class ContractSnapshotValidationTests(unittest.TestCase):
         self.assertIsNone(result["volume_diff"])
         self.assertEqual(result["open_interest_diff"], 0.0)
         self.assertEqual(result["alert_type"], "")
+
+
+class DashboardDataQualityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if shutil.which("node") is None:
+            raise unittest.SkipTest("Node.js is required for dashboard JavaScript tests")
+        html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
+        html = html_path.read_text(encoding="utf-8")
+
+        def extract(start, end):
+            a = html.index(start)
+            b = html.index(end, a)
+            return html[a:b]
+
+        cls.build_strike_map_js = extract(
+            "function buildStrikeMap(){",
+            "function calculateMaxPain(",
+        )
+        cls.oi_complete_js = extract(
+            "function areOIValuesComplete(",
+            "function hasAnyOI(",
+        )
+        cls.has_any_oi_js = extract(
+            "function hasAnyOI(",
+            "function loadData(",
+        )
+        cls.calculate_max_pain_js = extract(
+            "function calculateMaxPain(",
+            "function setMaxPainDisplay(",
+        )
+
+    def evaluate_dashboard_quality(self, rows):
+        script = f"""
+const allData = {json.dumps(rows)};
+const selectedContract = "2026-11";
+function isExpiredContract() {{ return false; }}
+function num(value) {{
+  if (value === null || value === undefined) return null;
+  const text = String(value).replace(/,/g, "").trim();
+  if (text === "" || ["-", "--", "－", "―", "—"].includes(text)) return null;
+  const n = Number(text);
+  return Number.isFinite(n) ? n : null;
+}}
+{self.build_strike_map_js}
+{self.oi_complete_js}
+{self.has_any_oi_js}
+{self.calculate_max_pain_js}
+const snapshot = buildStrikeMap();
+const maxPain = calculateMaxPain(snapshot.rows, snapshot.quality);
+console.log(JSON.stringify({{
+  quality: snapshot.quality,
+  oiComplete: areOIValuesComplete(snapshot.rows, snapshot.quality),
+  maxPain
+}}));
+"""
+        result = subprocess.run(
+            ["node", "-e", script],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return json.loads(result.stdout)
+
+    def base_pair(self):
+        return [
+            {"contract": "2026-11", "option_type": "CALL", "strike": "70000", "open_interest": "10"},
+            {"contract": "2026-11", "option_type": "PUT", "strike": "70000", "open_interest": "20"},
+            {"contract": "2026-11", "option_type": "CALL", "strike": "70250", "open_interest": "30"},
+            {"contract": "2026-11", "option_type": "PUT", "strike": "70250", "open_interest": "40"},
+        ]
+
+    def test_dashboard_accepts_complete_pairs_and_zero_oi(self):
+        rows = self.base_pair()
+        rows[0]["open_interest"] = "0"
+        result = self.evaluate_dashboard_quality(rows)
+        self.assertTrue(result["quality"]["pairComplete"])
+        self.assertTrue(result["oiComplete"])
+        self.assertIsNotNone(result["maxPain"])
+
+    def test_dashboard_rejects_missing_call_put_counterpart(self):
+        rows = self.base_pair()
+        rows.pop(1)
+        result = self.evaluate_dashboard_quality(rows)
+        self.assertFalse(result["quality"]["pairComplete"])
+        self.assertEqual(result["quality"]["missingPutStrikes"], 1)
+        self.assertFalse(result["oiComplete"])
+        self.assertIsNone(result["maxPain"])
+
+    def test_dashboard_rejects_duplicate_side_rows(self):
+        rows = self.base_pair()
+        rows.append(dict(rows[0]))
+        result = self.evaluate_dashboard_quality(rows)
+        self.assertEqual(result["quality"]["duplicateRows"], 1)
+        self.assertFalse(result["quality"]["pairComplete"])
+        self.assertFalse(result["oiComplete"])
+        self.assertIsNone(result["maxPain"])
+
+    def test_dashboard_rejects_incomplete_oi_but_reports_coverage(self):
+        rows = self.base_pair()
+        rows[0]["open_interest"] = ""
+        result = self.evaluate_dashboard_quality(rows)
+        self.assertTrue(result["quality"]["pairComplete"])
+        self.assertEqual(result["quality"]["missingOIValues"], 1)
+        self.assertEqual(result["quality"]["oiRate"], 87.5)
+        self.assertFalse(result["oiComplete"])
+        self.assertIsNone(result["maxPain"])
+
+    def test_dashboard_rejects_invalid_rows(self):
+        rows = self.base_pair()
+        rows.append({
+            "contract": "2026-11",
+            "option_type": "OTHER",
+            "strike": "70500",
+            "open_interest": "100",
+        })
+        result = self.evaluate_dashboard_quality(rows)
+        self.assertEqual(result["quality"]["invalidRows"], 1)
+        self.assertFalse(result["oiComplete"])
+        self.assertIsNone(result["maxPain"])
 
 
 if __name__ == "__main__":
