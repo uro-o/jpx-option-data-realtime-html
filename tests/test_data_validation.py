@@ -75,5 +75,46 @@ class ContractSnapshotValidationTests(unittest.TestCase):
             )
 
 
+    def test_number_preserves_zero_and_missing_values(self):
+        self.assertEqual(get_option_data.number("0"), 0.0)
+        self.assertEqual(get_option_data.number("1,250"), 1250.0)
+        self.assertIsNone(get_option_data.number(""))
+        self.assertIsNone(get_option_data.number(None))
+        self.assertIsNone(get_option_data.number("-"))
+        self.assertIsNone(get_option_data.number("not-a-number"))
+
+    def test_difference_is_not_computed_when_either_value_is_missing(self):
+        previous = [{
+            "contract": "2026-11",
+            "option_type": "CALL",
+            "strike": "70000",
+            "open_interest": "",
+            "volume": "10",
+            "last_price": "",
+            "ask_quantity": "",
+            "bid_quantity": "",
+        }]
+        current = [{
+            "contract": "2026-11",
+            "option_type": "CALL",
+            "strike": "70000",
+            "open_interest": "500",
+            "volume": "120",
+            "last_price": "",
+            "ask_quantity": "",
+            "bid_quantity": "",
+        }]
+
+        result = get_option_data.calculate_differences(
+            previous,
+            current,
+        )[0]
+
+        self.assertIsNone(result["open_interest_diff"])
+        self.assertEqual(result["volume_diff"], 110.0)
+        self.assertIsNone(result["last_price_diff"])
+        self.assertEqual(result["alert_type"], "VOLUME")
+
+
 if __name__ == "__main__":
     unittest.main()
