@@ -45,7 +45,7 @@
 残課題：
 - OIについて、日次公表値の変化と日中変化を区別するルールを別途定義する。
 
-### P0-4：Max Painのデータ完全性を検証する（一部実装・継続）
+### P0-4：Max Painのデータ完全性を検証する（一部完了：2026-11-05）
 
 実装済み：
 - CALL・PUTのOIがすべて数値でなければMax Painを計算しない
@@ -133,14 +133,14 @@
 ### P3-2：自動テストの拡充
 
 現状：
-- tests/test_data_validation.py に9件のテストを実装
+- tests/test_data_validation.py にPython側の検証テストとHTML JavaScript品質テストを実装
 - workflowでQRI取得前に python -m unittest discover -s tests -v を実行
 
 今後の追加：
 - 先限月・翌月・四半期限月の算出
 - 12月から翌年3月への切替
 - QRI HTML解析の正常系・列欠損
-- OI不完全時のMax Pain無効化を含むHTML側テスト
+- QRI HTML解析の正常系・列欠損\n- Discord送信失敗・再送
 - Discord送信失敗・再送
 - CSVの列順・文字コード・履歴保存の検査
 
@@ -169,6 +169,6 @@
 ### 2026-11-05
 - P0-1：全限月取得・CALL/PUTペア・重複・想定外限月を検証し、不完全データの保存を防止
 - P0-2：欠損値と0を分離し、差分・Discord表示・HTML表示・Max Painを欠損対応
-- P0-3：取引日をまたぐ出来高差分と誤アラートを抑止
-- 自動テストを9件に拡充し、Actionsで毎回実行
+- P0-3：取引日をまたぐ出来高差分と誤アラートを抑止\n- P0-4：HTML側でCALL/PUTペア、重複、不正行、OI取得率を検査し、Max Painの計算可否を判定
+- 自動テストを拡充し、Actionsで毎回実行
 - workflowのpush対象に get_option_data.py、tests/**、workflow自身を追加
