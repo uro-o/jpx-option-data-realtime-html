@@ -48,14 +48,16 @@
 ### P0-4：Max Painのデータ完全性を検証する（一部完了：2026-11-05）
 
 実装済み：
-- CALL・PUTのOIがすべて数値でなければMax Painを計算しない
-- OI合計・OI比率もOI不完全時は表示しない
-- 欠損値はゼロとして扱わない
+- StrikeごとのCALL/PUT行数を検査し、片側欠損を検出
+- 同一Strike・同一種別の重複行、不正Strike・不正種別を検出
+- CALL OI・PUT OIの取得数と取得率を画面に表示
+- ペアまたはOIが不完全な場合はMax Pain・OI合計・OI比率を更新しない
+- 実際のHTML内JavaScript関数をNode.jsでテスト
 
-未対応：
-- CALLとPUTの両方の行が丸ごと欠けたStrikeを検知する
-- 期待Strike集合・Strike範囲・件数の検査
-- QRIの期待Strike集合・正しいStrike範囲を定義できる基準データの確保
+未対応・制約：
+- CALLとPUTの両方の行が同じStrikeで丸ごと欠けた場合、現状は検知できない
+- 検知にはQRIの期待Strike一覧、または正しいStrike範囲を定義できる根拠データが必要
+- 現在はStrike間隔を推測して欠落Strikeを決めつけない
 
 ## 優先度P1 — 通知の信頼性・ルール統一
 
@@ -140,8 +142,6 @@
 - 先限月・翌月・四半期限月の算出
 - 12月から翌年3月への切替
 - QRI HTML解析の正常系・列欠損
-- QRI HTML解析の正常系・列欠損
-- Discord送信失敗・再送
 - Discord送信失敗・再送
 - CSVの列順・文字コード・履歴保存の検査
 
@@ -172,5 +172,5 @@
 - P0-2：欠損値と0を分離し、差分・Discord表示・HTML表示・Max Painを欠損対応
 - P0-3：取引日をまたぐ出来高差分と誤アラートを抑止
 - P0-4：HTML側でCALL/PUTペア、重複、不正行、OI取得率を検査し、Max Painの計算可否を判定
-- 自動テストを拡充し、Actionsで毎回実行
+- Python側の取得検証とNode.jsによるHTML品質判定を含む14テストをActionsで実行
 - workflowのpush対象に get_option_data.py、tests/**、workflow自身を追加
