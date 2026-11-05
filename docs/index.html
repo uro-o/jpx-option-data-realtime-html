@@ -32,16 +32,50 @@ function getActiveContracts(){return [...new Set(allData.map(d=>d.contract).filt
 function updateHeader(){if(!allData.length)return;const active=allData.filter(d=>!isExpiredContract(d.contract));const first=active[0]||allData[0];document.getElementById("qriUpdateTime").textContent=first.qri_update_time||"---";document.getElementById("collectedTime").textContent=first.collected_at||"---"}
 function getStoredMaxPain(contract){try{const raw=localStorage.getItem(MAX_PAIN_STORAGE_PREFIX+contract);if(!raw)return null;const obj=JSON.parse(raw);return obj&&Number.isFinite(Number(obj.value))?Number(obj.value):null}catch(e){return null}}
 function saveMaxPain(contract,value){try{localStorage.setItem(MAX_PAIN_STORAGE_PREFIX+contract,JSON.stringify({value:Number(value),savedAt:new Date().toISOString()}))}catch(e){}}
-function areOIValuesComplete(rows){return rows.length>0&&rows.every(r=>Number.isFinite(r.callOI)&&Number.isFinite(r.putOI))}
+function areOIValuesComplete(rows,quality){return rows.length>0&&quality&&quality.pairComplete&&quality.invalidRows===0&&quality.duplicateRows===0&&quality.missingOIValues===0&&rows.every(r=>Number.isFinite(r.callOI)&&Number.isFinite(r.putOI))}
 function hasAnyOI(rows){return rows.some(r=>r.callOI>0||r.putOI>0)}
 function loadData(){document.getElementById("dataStatus").textContent="読み込み中...";fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.text()}).then(text=>{allData=parseCSV(text);if(!allData.length)throw new Error("CSVが空です");const expired=[...new Set(allData.map(d=>d.contract).filter(Boolean))].filter(isExpiredContract);document.getElementById("dataStatus").textContent=(allData.length-expired.reduce((n,c)=>n+allData.filter(d=>d.contract===c).length,0)).toLocaleString()+" records"+(expired.length?" / 期限切れ除外: "+expired.map(formatContract).join(", "):"");updateHeader();initialize()}).catch(error=>{console.error(error);document.getElementById("dataStatus").textContent="読み込みエラー";chart.innerHTML=`<div class="message error">データを読み込めませんでした。<br><br>${error.message}</div>`})}
 function initialize(){const contracts=getActiveContracts();contracts.sort((a,b)=>contractSortValue(a)-contractSortValue(b));contractSelect.innerHTML="";contracts.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=formatContract(c);contractSelect.appendChild(o)});if(!selectedContract||!contracts.includes(selectedContract))selectedContract=contracts[0]||"";contractSelect.value=selectedContract;render()}
 function contractSortValue(contract){const m=String(contract).match(/(\d{4})-(\d{1,2})/);return m?Number(m[1])*100+Number(m[2]):999999}
-function buildStrikeMap(){const map=new Map();const rows=allData.filter(d=>d.contract===selectedContract&&!isExpiredContract(d.contract));rows.forEach(d=>{const strike=num(d.strike);if(strike===null)return;if(!map.has(strike))map.set(strike,{strike,callVolume:null,callOI:null,putOI:null,putVolume:null});const item=map.get(strike),type=String(d.option_type||"").trim().toUpperCase();if(type==="CALL"||type==="C"){item.callVolume=num(d.volume);item.callOI=num(d.open_interest)}if(type==="PUT"||type==="P"){item.putVolume=num(d.volume);item.putOI=num(d.open_interest)}});return[...map.values()]}
-function calculateMaxPain(rows){if(!areOIValuesComplete(rows)||!hasAnyOI(rows))return null;let bestStrike=null,bestPain=Infinity;rows.forEach(candidate=>{const settlement=candidate.strike;let pain=0;rows.forEach(r=>{if(settlement>r.strike)pain+=(settlement-r.strike)*r.callOI;if(settlement<r.strike)pain+=(r.strike-settlement)*r.putOI});if(pain<bestPain){bestPain=pain;bestStrike=settlement}});return bestStrike}
+function buildStrikeMap(){
+ const map=new Map();
+ const sourceRows=allData.filter(d=>d.contract===selectedContract&&!isExpiredContract(d.contract));
+ let invalidRows=0,duplicateRows=0;
+ sourceRows.forEach(d=>{
+  const strike=num(d.strike);
+  const type=String(d.option_type||"").trim().toUpperCase();
+  if(strike===null||(type!=="CALL"&&type!=="C"&&type!=="PUT"&&type!=="P")){invalidRows++;return}
+  if(!map.has(strike))map.set(strike,{strike,callVolume:null,callOI:null,putOI:null,putVolume:null,callRows:0,putRows:0});
+  const item=map.get(strike);
+  if(type==="CALL"||type==="C"){
+   item.callRows++;
+   if(item.callRows>1)duplicateRows++;
+   item.callVolume=num(d.volume);item.callOI=num(d.open_interest);
+  }else{
+   item.putRows++;
+   if(item.putRows>1)duplicateRows++;
+   item.putVolume=num(d.volume);item.putOI=num(d.open_interest);
+  }
+ });
+ const rows=[...map.values()];
+ const missingCallStrikes=rows.filter(r=>r.callRows===0).length;
+ const missingPutStrikes=rows.filter(r=>r.putRows===0).length;
+ const missingOIValues=rows.reduce((n,r)=>n+(Number.isFinite(r.callOI)?0:1)+(Number.isFinite(r.putOI)?0:1),0);
+ const validPairs=rows.filter(r=>r.callRows===1&&r.putRows===1).length;
+ const quality={
+  sourceRows:sourceRows.length,strikeCount:rows.length,invalidRows,duplicateRows,
+  missingCallStrikes,missingPutStrikes,missingOIValues,validPairs,
+  pairComplete:rows.length>0&&validPairs===rows.length,
+  oiRate:rows.length?((2*rows.length-missingOIValues)/(2*rows.length))*100:0
+ };
+ return{rows,quality};
+}
+function calculateMaxPain(rows,quality){if(!areOIValuesComplete(rows,quality)||!hasAnyOI(rows))return null;let bestStrike=null,bestPain=Infinity;rows.forEach(candidate=>{const settlement=candidate.strike;let pain=0;rows.forEach(r=>{if(settlement>r.strike)pain+=(settlement-r.strike)*r.callOI;if(settlement<r.strike)pain+=(r.strike-settlement)*r.putOI});if(pain<bestPain){bestPain=pain;bestStrike=settlement}});return bestStrike}
 function setMaxPainDisplay(value,waitingLabel="更新待ち"){const el=document.getElementById("maxPainValue");if(value===null){const previous=getStoredMaxPain(selectedContract);if(previous!==null){el.textContent=`${waitingLabel}（前回 ${formatNumber(previous)}円）`;el.classList.add("waiting")}else{el.textContent=`${waitingLabel}（前回なし）`;el.classList.add("waiting")}}else{el.textContent=`${formatNumber(value)}円`;el.classList.remove("waiting")}}
 function render(){
- let rows=buildStrikeMap();
+ const snapshot=buildStrikeMap();
+ let rows=snapshot.rows;
+ const quality=snapshot.quality;
  if(!rows.length){
   chart.innerHTML='<div class="message">データがありません。</div>';
   document.getElementById("maxPainValue").textContent="---";
@@ -50,18 +84,27 @@ function render(){
   document.getElementById("oiRatio").textContent="---";
   return;
  }
- const oiComplete=areOIValuesComplete(rows);
+ const oiComplete=areOIValuesComplete(rows,quality);
  const anyOI=hasAnyOI(rows);
- const currentMaxPain=calculateMaxPain(rows);
+ const currentMaxPain=calculateMaxPain(rows,quality);
+ const pairStatus=`CALL/PUT ${quality.validPairs}/${quality.strikeCount}`;
+ const oiStatus=`OI ${quality.strikeCount*2-quality.missingOIValues}/${quality.strikeCount*2}（${quality.oiRate.toFixed(1)}%）`;
+ const qualityWarnings=[];
+ if(quality.missingCallStrikes)qualityWarnings.push(`CALL欠損 ${quality.missingCallStrikes}`);
+ if(quality.missingPutStrikes)qualityWarnings.push(`PUT欠損 ${quality.missingPutStrikes}`);
+ if(quality.duplicateRows)qualityWarnings.push(`重複 ${quality.duplicateRows}`);
+ if(quality.invalidRows)qualityWarnings.push(`不正行 ${quality.invalidRows}`);
+ if(quality.missingOIValues)qualityWarnings.push(`OI欠損 ${quality.missingOIValues}`);
+ const qualityLabel=`${pairStatus} · ${oiStatus}${qualityWarnings.length?" · "+qualityWarnings.join(" / "):""}`;
  if(currentMaxPain!==null){
   maxPain=currentMaxPain;
   saveMaxPain(selectedContract,currentMaxPain);
   setMaxPainDisplay(currentMaxPain);
-  document.getElementById("dataStatus").textContent="OI取得済み";
+  document.getElementById("dataStatus").textContent=qualityLabel;
  }else{
   maxPain=getStoredMaxPain(selectedContract);
   setMaxPainDisplay(null,!oiComplete?"OI不完全":!anyOI?"OIなし":"計算待ち");
-  document.getElementById("dataStatus").textContent=!oiComplete?"OI未取得/不完全":!anyOI?"OIなし":"Max Pain計算待ち";
+  document.getElementById("dataStatus").textContent=qualityLabel+(!quality.pairComplete?" · CALL/PUTペア不完全":!oiComplete?" · Max Pain計算停止":!anyOI?" · OIなし":" · Max Pain計算待ち");
  }
  const totalCallOI=oiComplete?rows.reduce((sum,r)=>sum+r.callOI,0):null;
  const totalPutOI=oiComplete?rows.reduce((sum,r)=>sum+r.putOI,0):null;
