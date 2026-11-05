@@ -90,6 +90,7 @@ class ContractSnapshotValidationTests(unittest.TestCase):
             "contract": "2026-11",
             "option_type": "CALL",
             "strike": "70000",
+            "trading_day": "2026/11/05",
             "open_interest": "",
             "volume": "10",
             "last_price": "",
@@ -100,6 +101,7 @@ class ContractSnapshotValidationTests(unittest.TestCase):
             "contract": "2026-11",
             "option_type": "CALL",
             "strike": "70000",
+            "trading_day": "2026/11/05",
             "open_interest": "500",
             "volume": "120",
             "last_price": "",
@@ -133,6 +135,40 @@ class ContractSnapshotValidationTests(unittest.TestCase):
         })
         self.assertIn("取得不可", message)
         self.assertIn("—", message)
+
+
+    def test_volume_difference_is_suppressed_across_trading_days(self):
+        previous = [{
+            "contract": "2026-11",
+            "option_type": "CALL",
+            "strike": "70000",
+            "trading_day": "2026/11/05",
+            "open_interest": "100",
+            "volume": "500",
+            "last_price": "1000",
+            "ask_quantity": "10",
+            "bid_quantity": "10",
+        }]
+        current = [{
+            "contract": "2026-11",
+            "option_type": "CALL",
+            "strike": "70000",
+            "trading_day": "2026/11/06",
+            "open_interest": "100",
+            "volume": "20",
+            "last_price": "1000",
+            "ask_quantity": "10",
+            "bid_quantity": "10",
+        }]
+
+        result = get_option_data.calculate_differences(
+            previous,
+            current,
+        )[0]
+
+        self.assertIsNone(result["volume_diff"])
+        self.assertEqual(result["open_interest_diff"], 0.0)
+        self.assertEqual(result["alert_type"], "")
 
 
 if __name__ == "__main__":
