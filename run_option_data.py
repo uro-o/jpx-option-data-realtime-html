@@ -48,6 +48,7 @@ def next_calendar_month(year, month):
     return add_months(year, month, 1)
 
 
+# Contract-month selection was corrected on 2026-11-05 to prevent /1 and /2 collisions.
 def next_quarter_month(year, month):
     # Return the first quarterly month STRICTLY AFTER the supplied month.
     # Quarterly Nikkei 225 option months are Mar/Jun/Sep/Dec.
