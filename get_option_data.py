@@ -1931,6 +1931,10 @@ def build_discord_message(
     else:
         price_direction = "変化なし"
 
+    volume_diff_display = fmt(volume_diff)
+    if volume_diff is not None and volume_diff > 0:
+        volume_diff_display = "+" + volume_diff_display
+
     # ========================================================
     # Message
     # ========================================================
@@ -1950,7 +1954,7 @@ def build_discord_message(
         f"\n"
         f"📊 出来高\n"
         f"現在: `{fmt(current_volume)}`\n"
-        f"差分: `+{fmt(volume_diff)}` "
+        f"差分: `{volume_diff_display}` "
         f"({volume_direction})\n"
         f"\n"
         f"💹 最終価格\n"
