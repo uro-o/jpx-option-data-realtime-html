@@ -49,10 +49,16 @@ def next_calendar_month(year, month):
 
 
 def next_quarter_month(year, month):
+    # Return the first quarterly month STRICTLY AFTER the supplied month.
     # Quarterly Nikkei 225 option months are Mar/Jun/Sep/Dec.
+    #
+    # This must be strict (q > month), not inclusive (q >= month).
+    # Example: when the second listed month is Dec, the third contract
+    # must be Mar of the following year. Returning Dec again would cause
+    # the /2 URL to overwrite the /1 contract in build_contracts().
     quarters = (3, 6, 9, 12)
     for q in quarters:
-        if q >= month:
+        if q > month:
             return year, q
     return year + 1, 3
 
@@ -71,21 +77,39 @@ def build_contracts(today):
         front_month,
     )
 
-    # QRI's /2 page is the next quarterly contract in the
-    # three-month set (e.g. Sep -> Dec, Oct -> Dec,
-    # Nov -> Dec; after Dec SQ it becomes Mar).
+    # QRI's /2 page is the first quarterly contract strictly
+    # after the second listed month.
+    # Examples:
+    #   Sep -> Oct -> Dec
+    #   Oct -> Nov -> Dec
+    #   Nov -> Dec -> Mar (following year)
+    #   After Dec SQ: Jan -> Feb -> Mar
     third_year, third_month = next_quarter_month(
         second_year,
         second_month,
     )
 
+    contract_months = (
+        (front_year, front_month),
+        (second_year, second_month),
+        (third_year, third_month),
+    )
+
+    # Fail loudly instead of silently overwriting a contract when
+    # the month calculation produces duplicate keys.
+    contract_keys = [
+        f"{year:04d}-{month:02d}"
+        for year, month in contract_months
+    ]
+    if len(contract_keys) != len(set(contract_keys)):
+        raise ValueError(
+            f"Duplicate QRI contract months calculated: {contract_keys}"
+        )
+
     contracts = {
-        f"{front_year:04d}-{front_month:02d}":
-            "https://svc.qri.jp/jpx/nkopm/",
-        f"{second_year:04d}-{second_month:02d}":
-            "https://svc.qri.jp/jpx/nkopm/1",
-        f"{third_year:04d}-{third_month:02d}":
-            "https://svc.qri.jp/jpx/nkopm/2",
+        contract_keys[0]: "https://svc.qri.jp/jpx/nkopm/",
+        contract_keys[1]: "https://svc.qri.jp/jpx/nkopm/1",
+        contract_keys[2]: "https://svc.qri.jp/jpx/nkopm/2",
     }
 
     return contracts
