@@ -122,7 +122,9 @@ Webhook URLをログ・コミット・画面共有へ出さないでください
 1. 対象限月のCALL・PUT OIが取得されているか確認
 2. 空欄と実際のゼロを区別する
 3. OIが不完全な状態で計算されていないか確認
-4. HTMLのCALL/PUTペア数・重複・不正行・OI欠損数を確認\n5. HTMLの計算対象Strikeと元CSVを照合\n6. CALL/PUT両方の行が同一Strikeで欠落するケースは、現状のCSVだけでは検出できないことに注意
+4. HTMLのCALL/PUTペア数・重複・不正行・OI欠損数を確認
+5. HTMLの計算対象Strikeと元CSVを照合
+6. CALL/PUT両方の行が同一Strikeで欠落するケースは、現状のCSVだけでは検出できないことに注意
 
 ### E. Discord通知が来ない
 
@@ -182,4 +184,11 @@ Webhook URLをログ・コミット・画面共有へ出さないでください
 - 出来高差分は前回・今回の `trading_day` が一致する場合だけ算出。
 - 取引日が異なる／日付が欠損している場合は出来高差分と出来高アラートを抑止。
 - OI差分は別ルールとして現状維持。
-\n## 12. 2026-11-05 変更記録：Max Pain品質検査\n\n- HTMLでStrikeごとのCALL/PUT行数を検査し、片側欠損・重複・不正行を検出。\n- CALL OI・PUT OIの取得数と取得率を表示。\n- ペアまたはOIが不完全な場合はMax Pain・OI合計・OI比率を更新しない。\n- Node.jsを使い、実際のHTML内JavaScript関数をテストするケースを追加。\n- CALL/PUT両方が同じStrikeで欠けるケースは期待Strike一覧がないため未検出。\n
+
+## 12. 2026-11-05 変更記録：Max Pain品質検査
+
+- HTMLでStrikeごとのCALL/PUT行数を検査し、片側欠損・重複・不正行を検出。
+- CALL OI・PUT OIの取得数と取得率を表示。
+- ペアまたはOIが不完全な場合はMax Pain・OI合計・OI比率を更新しない。
+- Node.jsを使い、実際のHTML内JavaScript関数をテストするケースを追加。
+- CALL/PUT両方が同じStrikeで欠けるケースは期待Strike一覧がないため未検出。
