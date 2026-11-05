@@ -2,6 +2,7 @@ import csv
 import re
 import time
 import os
+import math
 
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -1410,7 +1411,8 @@ def number(value):
         return None
 
     try:
-        return float(text.replace(",", ""))
+        parsed = float(text.replace(",", ""))
+        return parsed if math.isfinite(parsed) else None
     except (TypeError, ValueError):
         return None
 
