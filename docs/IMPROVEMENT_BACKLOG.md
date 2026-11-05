@@ -140,7 +140,8 @@
 - 先限月・翌月・四半期限月の算出
 - 12月から翌年3月への切替
 - QRI HTML解析の正常系・列欠損
-- QRI HTML解析の正常系・列欠損\n- Discord送信失敗・再送
+- QRI HTML解析の正常系・列欠損
+- Discord送信失敗・再送
 - Discord送信失敗・再送
 - CSVの列順・文字コード・履歴保存の検査
 
@@ -169,6 +170,7 @@
 ### 2026-11-05
 - P0-1：全限月取得・CALL/PUTペア・重複・想定外限月を検証し、不完全データの保存を防止
 - P0-2：欠損値と0を分離し、差分・Discord表示・HTML表示・Max Painを欠損対応
-- P0-3：取引日をまたぐ出来高差分と誤アラートを抑止\n- P0-4：HTML側でCALL/PUTペア、重複、不正行、OI取得率を検査し、Max Painの計算可否を判定
+- P0-3：取引日をまたぐ出来高差分と誤アラートを抑止
+- P0-4：HTML側でCALL/PUTペア、重複、不正行、OI取得率を検査し、Max Painの計算可否を判定
 - 自動テストを拡充し、Actionsで毎回実行
 - workflowのpush対象に get_option_data.py、tests/**、workflow自身を追加
