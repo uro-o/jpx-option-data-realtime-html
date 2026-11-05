@@ -1541,9 +1541,23 @@ def calculate_differences(
             else None
         )
 
+        previous_trading_day = str(
+            previous.get("trading_day") or ""
+        ).strip()
+        current_trading_day = str(
+            current.get("trading_day") or ""
+        ).strip()
+
+        # Volume is a per-trading-day cumulative value. Never compare
+        # across trading-day boundaries or when either date is unknown.
         volume_diff = (
             current_volume - previous_volume
-            if current_volume is not None and previous_volume is not None
+            if (
+                current_volume is not None
+                and previous_volume is not None
+                and previous_trading_day
+                and previous_trading_day == current_trading_day
+            )
             else None
         )
 
