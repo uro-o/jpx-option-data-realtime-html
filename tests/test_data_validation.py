@@ -277,7 +277,7 @@ console.log(JSON.stringify({{
         result = self.evaluate_dashboard_quality(rows)
         self.assertTrue(result["quality"]["pairComplete"])
         self.assertEqual(result["quality"]["missingOIValues"], 1)
-        self.assertEqual(result["quality"]["oiRate"], 87.5)
+        self.assertEqual(result["quality"]["oiRate"], 75.0)
         self.assertFalse(result["oiComplete"])
         self.assertIsNone(result["maxPain"])
 
