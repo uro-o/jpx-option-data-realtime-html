@@ -20,7 +20,7 @@ QRIが公開する日経225オプション情報を定期取得し、限月・CA
 2. `.github/workflows/update-option-data.yml` がPython 3.12を準備し、`requests` と `beautifulsoup4` をインストールする。
 3. `run_option_data.py` が当日基準の3限月とQRI URLを決定する。
 4. `run_option_data.py` が `get_option_data.py` の限月設定と履歴保存関数を差し替え、取得処理を実行する。
-5. `get_option_data.py` がQRIの3ページを取得・解析し、差分を計算してDiscord通知を試み、`data/latest.csv` 等を保存する。
+5. `get_option_data.py` がQRIの3ページを取得・解析し、全限月・全StrikeのCALL/PUTペアを検証する。検証成功後に差分・Discord通知・最新CSV等を更新する。
 6. Actionsが `data/` の変更をコミットしてmainへpushする。
 7. `docs/index.html` がGitHub上の `data/latest.csv` を読み込み、Strike別のCALL/PUT情報を表示する。
 
@@ -37,6 +37,7 @@ QRIが公開する日経225オプション情報を定期取得し、限月・CA
 | `detect_large_trades.py` | `differences.csv` を使う独立した大口変動検出処理 |
 | `notify_discord.py` | `differences.csv` を使う独立した通知・重複通知管理処理 |
 | `docs/index.html` | GitHub Pages用のモニター画面 |
+| `tests/test_data_validation.py` | 3限月の完全性・重複・CALL/PUTペア検証テスト |
 | `data/latest.csv` | 最新取得データ |
 | `data/differences.csv` | 現行取得処理が生成する前回比較データ |
 | `data/history/` | 限月・取引日別の履歴CSVと保存済みマーカー |
@@ -72,14 +73,14 @@ GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません�
 
 ## 現在確認されている注意点
 
-- 3限月の一部取得に失敗しても、他の限月のデータがあれば処理を続け、最新CSVを更新する構造です。
+- 3限月すべての取得成功と、各StrikeのCALL/PUTペアを検証してから出力を更新します。取得失敗・欠損・重複があれば処理をエラー終了し、既存の最新CSV等を保持します。
 - 数値変換関数が空欄を0として扱うため、未取得と実際のゼロが混同されます。
 - 差分キーに取引日が含まれず、取引日切替時の出来高差分に注意が必要です。
 - Discord送信失敗後も最新CSVが更新されるため、通知を再送できない可能性があります。
 - `calculate_difference.py`、`detect_large_trades.py`、`notify_discord.py` は独立スクリプトであり、現在のActionsワークフローからは呼び出されていません。
 - HTMLの現在値欄には現状、価格を設定する取得処理がありません。
 - HTML側の数値変換も空欄を0として扱います。Max PainはOIの完全性を検証してから計算する必要があります。
-- `requirements.txt` と自動テストはまだありません。
+- `requirements.txt` はまだありません。データ完全性検証の自動テストを `tests/test_data_validation.py` に追加しました。
 
 改善の優先順位は[改善課題一覧](docs/IMPROVEMENT_BACKLOG.md)を参照してください。
 
