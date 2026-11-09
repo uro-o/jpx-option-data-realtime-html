@@ -130,8 +130,10 @@ function render(){
   const co=Math.min(100,barValue(r.callOI)/maxOI*100);
   const po=Math.min(100,barValue(r.putOI)/maxOI*100);
   const pv=Math.min(100,barValue(r.putVolume)/maxVolume*100);
-  const callOILabel=oiComplete?formatNumber(r.callOI):"—";
-  const putOILabel=oiComplete?formatNumber(r.putOI):"—";
+  // Keep valid per-strike OI visible even when another strike is incomplete.
+  // Missing cells render as "—"; aggregate metrics and Max Pain remain disabled.
+  const callOILabel=formatNumber(r.callOI);
+  const putOILabel=formatNumber(r.putOI);
   row.innerHTML=`<div class="bar-cell call-volume"><div class="bar-area"><div class="bar" style="width:${cv}%"></div><div class="bar-value">${formatNumber(r.callVolume)}</div></div></div><div class="bar-cell call-oi"><div class="bar-area"><div class="bar" style="width:${co}%"></div><div class="bar-value">${callOILabel}</div></div></div><div class="strike">${formatNumber(r.strike)}${currentMaxPain!==null&&r.strike===currentMaxPain?'<span class="max-pain-marker">MAX</span>':''}</div><div class="bar-cell put-oi"><div class="bar-area"><div class="bar" style="width:${po}%"></div><div class="bar-value">${putOILabel}</div></div></div><div class="bar-cell put-volume"><div class="bar-area"><div class="bar" style="width:${pv}%"></div><div class="bar-value">${formatNumber(r.putVolume)}</div></div></div>`;
   chart.appendChild(row);
  });
