@@ -243,6 +243,8 @@ console.log(JSON.stringify({{
         self.assertIn("const callOILabel=formatNumber(r.callOI);", html)
         self.assertIn("const putOILabel=formatNumber(r.putOI);", html)
         self.assertNotIn('const callOILabel=oiComplete?formatNumber(r.callOI):"—";', html)
+        self.assertIn("CALL OI ${quality.strikeCount-quality.missingCallOIValues}", html)
+        self.assertIn("PUT OI ${quality.strikeCount-quality.missingPutOIValues}", html)
 
     def base_pair(self):
         return [
@@ -284,6 +286,8 @@ console.log(JSON.stringify({{
         result = self.evaluate_dashboard_quality(rows)
         self.assertTrue(result["quality"]["pairComplete"])
         self.assertEqual(result["quality"]["missingOIValues"], 1)
+        self.assertEqual(result["quality"]["missingCallOIValues"], 1)
+        self.assertEqual(result["quality"]["missingPutOIValues"], 0)
         self.assertEqual(result["quality"]["oiRate"], 75.0)
         self.assertFalse(result["oiComplete"])
         self.assertIsNone(result["maxPain"])
