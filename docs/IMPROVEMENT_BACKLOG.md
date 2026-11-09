@@ -45,20 +45,29 @@
 残課題：
 - OIについて、日次公表値の変化と日中変化を区別するルールを別途定義する。
 
-### P0-4：Max Painのデータ完全性を検証する（一部完了：2026-11-05）
+### P0-4：Max Painのデータ完全性を検証する（一部完了：2026-11-09）
 
 実装済み：
-- StrikeごとのCALL/PUT行数を検査し、片側欠損を検出
-- 同一Strike・同一種別の重複行、不正Strike・不正種別を検出
-- CALL OI・PUT OIの取得数と取得率を画面に表示
-- OIが一部欠損していても、取得できているStrike単位のOIは表示し、欠損セルだけ「—」にする
-- ペアまたはOIが不完全な場合はMax Pain・OI合計・OI比率を更新しない
-- 実際のHTML内JavaScript関数をNode.jsでテスト
+- StrikeごとのCALL/PUT行数、重複行、不正Strike・不正種別を検査
+- QRIのOIセルを数値・ハイフン・空文字・解析不能に分類
+- `open_interest_status` 列を追加し、QRI原表の状態をCSVに保持
+- JPX日次建玉データ由来の公開表との複数Strike照合に基づき、QRIの「-」を暫定的に0として集計
+- HTMLにCALL/PUT別のQRIハイフン件数を表示
+- OI数値が全Strikeで揃う場合はMax Pain・OI合計・OI比率を計算
+- 空セル・解析不能・ペア不完全・重複・不正行があれば集計を停止
+- PythonとHTML JavaScriptの自動テストを実装
+
+確認結果（2026-11-09 11:15 QRI更新）：
+- 2026-11限：CALL 240/240、PUT 240/240。ハイフンはCALL 101、PUT 70
+- 2026-12限：CALL 348/348、PUT 348/348。ハイフンはCALL 184、PUT 130
+- 2027-03限：CALL 121/121、PUT 121/121。ハイフンはCALL 83、PUT 58
+- 3限月合計1,418レコードでOI空欄0件。ハイフン626件は0として計算し、原表状態を保持
+- GitHub Actionsで17テスト成功
 
 未対応・制約：
-- CALLとPUTの両方の行が同じStrikeで丸ごと欠けた場合、現状は検知できない
-- 検知にはQRIの期待Strike一覧、または正しいStrike範囲を定義できる根拠データが必要
-- 現在はStrike間隔を推測して欠落Strikeを決めつけない
+- QRI自身の仕様説明で「-」の意味を明記した資料は未確認。JPX日次建玉データ由来の公開表との複数Strike照合に基づく暫定解釈であり、引き続き原本との照合を行う
+- CALLとPUTの両方の行が同じStrikeで丸ごと欠けた場合、現状は検知できない。検知にはQRIの期待Strike一覧または信頼できる基準データが必要
+- Strike間隔を推測して欠落Strikeを決めつけない
 
 ## 優先度P1 — 通知の信頼性・ルール統一
 
@@ -178,5 +187,5 @@
 - P0-2：欠損値と0を分離し、差分・Discord表示・HTML表示・Max Painを欠損対応
 - P0-3：取引日をまたぐ出来高差分と誤アラートを抑止
 - P0-4：HTML側でCALL/PUTペア、重複、不正行、OI取得率を検査し、Max Painの計算可否を判定
-- Python側の取得検証とNode.jsによるHTML品質判定を含む14テストをActionsで実行
+- Python側の取得検証とNode.jsによるHTML品質判定を含む17テストをActionsで実行
 - workflowのpush対象に get_option_data.py、tests/**、workflow自身を追加
