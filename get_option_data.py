@@ -676,6 +676,7 @@ def parse_option_table(
     )
 
     records = []
+    oi_diagnostic_samples = 0
 
     for row in rows:
 
@@ -831,6 +832,24 @@ def parse_option_table(
                 strip=True,
             )
         )
+
+        # Capture a few raw source rows when OI is blank. This helps distinguish
+        # genuinely empty QRI cells from parser column/index drift.
+        if (call_oi is None or put_oi is None) and oi_diagnostic_samples < 2:
+            raw_cells = []
+            for cell_index, cell in enumerate(cells):
+                raw_cells.append({
+                    "i": cell_index,
+                    "text": clean_text(cell.get_text(" ", strip=True)),
+                    "class": cell.get("class", []),
+                    "data_label": cell.get("data-label"),
+                    "title": cell.get("title"),
+                })
+            print(
+                f"[OI RAW ROW] {contract} strike={strike}: "
+                f"{raw_cells}"
+            )
+            oi_diagnostic_samples += 1
 
         put_settlement = extract_number(
             cells[16].get_text(
