@@ -100,7 +100,7 @@ function render(){
  if(quality.duplicateRows)qualityWarnings.push(`重複 ${quality.duplicateRows}`);
  if(quality.invalidRows)qualityWarnings.push(`不正行 ${quality.invalidRows}`);
  if(quality.missingOIValues)qualityWarnings.push(`OI未数値 ${quality.missingOIValues}`);
- const qualityLabel=`${pairStatus} · ${oiStatus}${qualityWarnings.length?" · "+qualityWarnings.join(" / "):""}${quality.oiStatusAvailable?" · QRI「-」は0補完せず":" · 旧CSV（OI原表状態なし）"}`;
+ const qualityLabel=`${pairStatus} · ${oiStatus}${qualityWarnings.length?" · "+qualityWarnings.join(" / "):""}${quality.oiStatusAvailable?" · QRI「-」は0として集計（原表状態保持）":" · 旧CSV（OI原表状態なし）"}`;
  if(currentMaxPain!==null){
   maxPain=currentMaxPain;
   saveMaxPain(selectedContract,currentMaxPain);
