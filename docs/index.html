@@ -60,11 +60,13 @@ function buildStrikeMap(){
  const rows=[...map.values()];
  const missingCallStrikes=rows.filter(r=>r.callRows===0).length;
  const missingPutStrikes=rows.filter(r=>r.putRows===0).length;
- const missingOIValues=rows.reduce((n,r)=>n+(Number.isFinite(r.callOI)?0:1)+(Number.isFinite(r.putOI)?0:1),0);
+ const missingCallOIValues=rows.reduce((n,r)=>n+(Number.isFinite(r.callOI)?0:1),0);
+ const missingPutOIValues=rows.reduce((n,r)=>n+(Number.isFinite(r.putOI)?0:1),0);
+ const missingOIValues=missingCallOIValues+missingPutOIValues;
  const validPairs=rows.filter(r=>r.callRows===1&&r.putRows===1).length;
  const quality={
   sourceRows:sourceRows.length,strikeCount:rows.length,invalidRows,duplicateRows,
-  missingCallStrikes,missingPutStrikes,missingOIValues,validPairs,
+  missingCallStrikes,missingPutStrikes,missingCallOIValues,missingPutOIValues,missingOIValues,validPairs,
   pairComplete:rows.length>0&&validPairs===rows.length,
   oiRate:rows.length?((2*rows.length-missingOIValues)/(2*rows.length))*100:0
  };
@@ -88,7 +90,7 @@ function render(){
  const anyOI=hasAnyOI(rows);
  const currentMaxPain=calculateMaxPain(rows,quality);
  const pairStatus=`CALL/PUT ${quality.validPairs}/${quality.strikeCount}`;
- const oiStatus=`OI ${quality.strikeCount*2-quality.missingOIValues}/${quality.strikeCount*2}（${quality.oiRate.toFixed(1)}%）`;
+ const oiStatus=`CALL OI ${quality.strikeCount-quality.missingCallOIValues}/${quality.strikeCount} · PUT OI ${quality.strikeCount-quality.missingPutOIValues}/${quality.strikeCount}（全体 ${quality.oiRate.toFixed(1)}%）`;
  const qualityWarnings=[];
  if(quality.missingCallStrikes)qualityWarnings.push(`CALL欠損 ${quality.missingCallStrikes}`);
  if(quality.missingPutStrikes)qualityWarnings.push(`PUT欠損 ${quality.missingPutStrikes}`);
