@@ -272,6 +272,23 @@ def extract_number(text):
 
 
 # ============================================================
+# Open interest cell parser
+# ============================================================
+
+def parse_oi_cell(cell):
+    """Return numeric OI and the exact source-cell state separately."""
+    raw = clean_text(cell.get_text(" ", strip=True)) if cell is not None else ""
+    if not raw:
+        return None, "blank"
+    if raw in ("-", "--", "－", "―", "—"):
+        return None, "dash"
+    value = extract_number(raw)
+    if value is None:
+        return None, "invalid"
+    return value, "numeric"
+
+
+# ============================================================
 # Price + time
 # ============================================================
 
@@ -676,7 +693,10 @@ def parse_option_table(
     )
 
     records = []
-    oi_diagnostic_samples = 0
+    oi_source_status = {
+        side: {"numeric": 0, "dash": 0, "blank": 0, "invalid": 0}
+        for side in ("CALL", "PUT")
+    }
 
     for row in rows:
 
@@ -707,12 +727,8 @@ def parse_option_table(
             )
         )
 
-        call_oi = extract_number(
-            cells[1].get_text(
-                " ",
-                strip=True,
-            )
-        )
+        call_oi, call_oi_status = parse_oi_cell(cells[1])
+        oi_source_status["CALL"][call_oi_status] += 1
 
         call_volume = extract_number(
             cells[2].get_text(
@@ -826,30 +842,9 @@ def parse_option_table(
             )
         )
 
-        put_oi = extract_number(
-            cells[15].get_text(
-                " ",
-                strip=True,
-            )
-        )
+        put_oi, put_oi_status = parse_oi_cell(cells[15])
+        oi_source_status["PUT"][put_oi_status] += 1
 
-        # Capture a few raw source rows when OI is blank. This helps distinguish
-        # genuinely empty QRI cells from parser column/index drift.
-        if (call_oi is None or put_oi is None) and oi_diagnostic_samples < 2:
-            raw_cells = []
-            for cell_index, cell in enumerate(cells):
-                raw_cells.append({
-                    "i": cell_index,
-                    "text": clean_text(cell.get_text(" ", strip=True)),
-                    "class": cell.get("class", []),
-                    "data_label": cell.get("data-label"),
-                    "title": cell.get("title"),
-                })
-            print(
-                f"[OI RAW ROW] {contract} strike={strike}: "
-                f"{raw_cells}"
-            )
-            oi_diagnostic_samples += 1
 
         put_settlement = extract_number(
             cells[16].get_text(
@@ -1005,6 +1000,11 @@ def parse_option_table(
         f"[OI COVERAGE] {contract}: "
         f"CALL={call_oi_count}/{call_count}, "
         f"PUT={put_oi_count}/{put_count}"
+    )
+    print(
+        f"[OI SOURCE STATUS] {contract}: "
+        f"CALL={oi_source_status['CALL']}, "
+        f"PUT={oi_source_status['PUT']}"
     )
 
     return records
