@@ -308,6 +308,18 @@ console.log(JSON.stringify({{
         self.assertFalse(result["oiComplete"])
         self.assertIsNone(result["maxPain"])
 
+    def test_dashboard_counts_qri_dash_states_without_treating_them_as_zero(self):
+        rows = self.base_pair()
+        rows[0]["open_interest"] = ""
+        rows[0]["open_interest_status"] = "dash"
+        rows[1]["open_interest_status"] = "numeric"
+        result = self.evaluate_dashboard_quality(rows)
+        self.assertTrue(result["quality"]["oiStatusAvailable"])
+        self.assertEqual(result["quality"]["callOIdash"], 1)
+        self.assertEqual(result["quality"]["putOIdash"], 0)
+        self.assertFalse(result["oiComplete"])
+        self.assertIsNone(result["maxPain"])
+
     def test_dashboard_rejects_invalid_rows(self):
         rows = self.base_pair()
         rows.append({
