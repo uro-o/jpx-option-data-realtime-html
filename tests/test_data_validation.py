@@ -237,6 +237,13 @@ console.log(JSON.stringify({{
         )
         return json.loads(result.stdout)
 
+    def test_dashboard_keeps_available_strike_oi_visible_when_incomplete(self):
+        html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
+        html = html_path.read_text(encoding="utf-8")
+        self.assertIn("const callOILabel=formatNumber(r.callOI);", html)
+        self.assertIn("const putOILabel=formatNumber(r.putOI);", html)
+        self.assertNotIn('const callOILabel=oiComplete?formatNumber(r.callOI):"—";', html)
+
     def base_pair(self):
         return [
             {"contract": "2026-11", "option_type": "CALL", "strike": "70000", "open_interest": "10"},
