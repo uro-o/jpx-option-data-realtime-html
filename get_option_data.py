@@ -282,7 +282,10 @@ def parse_oi_cell(cell):
     if not raw:
         return None, "blank"
     if raw in ("-", "--", "－", "―", "—"):
-        return None, "dash"
+        # Cross-check against JPX daily OI data indicates QRI uses a dash
+        # for a zero-position cell. Preserve "dash" status for audit, but
+        # use numeric 0 for totals and Max Pain.
+        return 0.0, "dash"
     value = extract_number(raw)
     if value is None:
         return None, "invalid"
