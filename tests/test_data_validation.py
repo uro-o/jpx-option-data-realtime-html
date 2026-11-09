@@ -82,6 +82,7 @@ class ContractSnapshotValidationTests(unittest.TestCase):
     def test_oi_cell_distinguishes_dash_blank_zero_and_numeric(self):
         cases = [
             ("-", (0.0, "dash")),
+            (" - ", (0.0, "dash")),
             ("—", (0.0, "dash")),
             ("", (None, "blank")),
             ("0", (0.0, "numeric")),
