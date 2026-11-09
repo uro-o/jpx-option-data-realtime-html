@@ -81,8 +81,8 @@ class ContractSnapshotValidationTests(unittest.TestCase):
 
     def test_oi_cell_distinguishes_dash_blank_zero_and_numeric(self):
         cases = [
-            ("-", (None, "dash")),
-            ("—", (None, "dash")),
+            ("-", (0.0, "dash")),
+            ("—", (0.0, "dash")),
             ("", (None, "blank")),
             ("0", (0.0, "numeric")),
             ("1,250", (1250.0, "numeric")),
@@ -261,6 +261,7 @@ console.log(JSON.stringify({{
         self.assertNotIn('const callOILabel=oiComplete?formatNumber(r.callOI):"—";', html)
         self.assertIn("CALL OI ${quality.strikeCount-quality.missingCallOIValues}", html)
         self.assertIn("PUT OI ${quality.strikeCount-quality.missingPutOIValues}", html)
+        self.assertIn("QRI「-」は0として集計（原表状態保持）", html)
 
     def base_pair(self):
         return [
