@@ -92,6 +92,7 @@ FIELDNAMES = [
     "strike",
     "settlement",
     "open_interest",
+    "open_interest_status",
     "volume",
     "ask_iv",
     "bid_iv",
@@ -894,6 +895,9 @@ def parse_option_table(
             "open_interest":
                 call_oi,
 
+            "open_interest_status":
+                call_oi_status,
+
             "volume":
                 call_volume,
 
@@ -946,6 +950,9 @@ def parse_option_table(
 
             "open_interest":
                 put_oi,
+
+            "open_interest_status":
+                put_oi_status,
 
             "volume":
                 put_volume,
