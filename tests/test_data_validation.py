@@ -88,6 +88,8 @@ class ContractSnapshotValidationTests(unittest.TestCase):
             ("1,250", (1250.0, "numeric")),
             ("N/A", (None, "invalid")),
         ]
+        self.assertIn("open_interest_status", get_option_data.FIELDNAMES)
+        self.assertEqual(get_option_data.FIELDNAMES.index("open_interest_status"), get_option_data.FIELDNAMES.index("open_interest") + 1)
         for raw, expected in cases:
             with self.subTest(raw=raw):
                 cell = get_option_data.BeautifulSoup(
