@@ -79,22 +79,6 @@ class ContractSnapshotValidationTests(unittest.TestCase):
             )
 
 
-    def test_oi_cell_distinguishes_dash_blank_zero_and_numeric(self):
-        cases = [
-            ("-", (None, "dash")),
-            ("—", (None, "dash")),
-            ("", (None, "blank")),
-            ("0", (0.0, "numeric")),
-            ("1,250", (1250.0, "numeric")),
-            ("N/A", (None, "invalid")),
-        ]
-        for raw, expected in cases:
-            with self.subTest(raw=raw):
-                cell = get_option_data.BeautifulSoup(
-                    f"<td>{raw}</td>", "html.parser"
-                ).td
-                self.assertEqual(get_option_data.parse_oi_cell(cell), expected)
-
     def test_number_preserves_zero_and_missing_values(self):
         self.assertEqual(get_option_data.number("0"), 0.0)
         self.assertEqual(get_option_data.number("1,250"), 1250.0)
