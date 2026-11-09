@@ -40,11 +40,14 @@ function contractSortValue(contract){const m=String(contract).match(/(\d{4})-(\d
 function buildStrikeMap(){
  const map=new Map();
  const sourceRows=allData.filter(d=>d.contract===selectedContract&&!isExpiredContract(d.contract));
- let invalidRows=0,duplicateRows=0;
+ let invalidRows=0,duplicateRows=0,callOIdash=0,putOIdash=0;
+ const oiStatusAvailable=sourceRows.some(d=>Object.prototype.hasOwnProperty.call(d,"open_interest_status"));
  sourceRows.forEach(d=>{
   const strike=num(d.strike);
   const type=String(d.option_type||"").trim().toUpperCase();
   if(strike===null||(type!=="CALL"&&type!=="C"&&type!=="PUT"&&type!=="P")){invalidRows++;return}
+  if(type==="CALL"&&d.open_interest_status==="dash")callOIdash++;
+  if(type==="PUT"&&d.open_interest_status==="dash")putOIdash++;
   if(!map.has(strike))map.set(strike,{strike,callVolume:null,callOI:null,putOI:null,putVolume:null,callRows:0,putRows:0});
   const item=map.get(strike);
   if(type==="CALL"||type==="C"){
@@ -65,7 +68,7 @@ function buildStrikeMap(){
  const missingOIValues=missingCallOIValues+missingPutOIValues;
  const validPairs=rows.filter(r=>r.callRows===1&&r.putRows===1).length;
  const quality={
-  sourceRows:sourceRows.length,strikeCount:rows.length,invalidRows,duplicateRows,
+  sourceRows:sourceRows.length,strikeCount:rows.length,invalidRows,duplicateRows,oiStatusAvailable,callOIdash,putOIdash,
   missingCallStrikes,missingPutStrikes,missingCallOIValues,missingPutOIValues,missingOIValues,validPairs,
   pairComplete:rows.length>0&&validPairs===rows.length,
   oiRate:rows.length?((2*rows.length-missingOIValues)/(2*rows.length))*100:0
@@ -90,14 +93,14 @@ function render(){
  const anyOI=hasAnyOI(rows);
  const currentMaxPain=calculateMaxPain(rows,quality);
  const pairStatus=`CALL/PUT ${quality.validPairs}/${quality.strikeCount}`;
- const oiStatus=`CALL OI ${quality.strikeCount-quality.missingCallOIValues}/${quality.strikeCount} · PUT OI ${quality.strikeCount-quality.missingPutOIValues}/${quality.strikeCount}（全体 ${quality.oiRate.toFixed(1)}%）`;
+ const oiStatus=`CALL OI ${quality.strikeCount-quality.missingCallOIValues}/${quality.strikeCount}（「-」${quality.callOIdash}） · PUT OI ${quality.strikeCount-quality.missingPutOIValues}/${quality.strikeCount}（「-」${quality.putOIdash}）`;
  const qualityWarnings=[];
  if(quality.missingCallStrikes)qualityWarnings.push(`CALL欠損 ${quality.missingCallStrikes}`);
  if(quality.missingPutStrikes)qualityWarnings.push(`PUT欠損 ${quality.missingPutStrikes}`);
  if(quality.duplicateRows)qualityWarnings.push(`重複 ${quality.duplicateRows}`);
  if(quality.invalidRows)qualityWarnings.push(`不正行 ${quality.invalidRows}`);
- if(quality.missingOIValues)qualityWarnings.push(`OI欠損 ${quality.missingOIValues}`);
- const qualityLabel=`${pairStatus} · ${oiStatus}${qualityWarnings.length?" · "+qualityWarnings.join(" / "):""}`;
+ if(quality.missingOIValues)qualityWarnings.push(`OI未数値 ${quality.missingOIValues}`);
+ const qualityLabel=`${pairStatus} · ${oiStatus}${qualityWarnings.length?" · "+qualityWarnings.join(" / "):""}${quality.oiStatusAvailable?" · QRI「-」は0補完せず":" · 旧CSV（OI原表状態なし）"}`;
  if(currentMaxPain!==null){
   maxPain=currentMaxPain;
   saveMaxPain(selectedContract,currentMaxPain);
