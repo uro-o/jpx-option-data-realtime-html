@@ -978,6 +978,16 @@ def parse_option_table(
             put_record
         )
 
+    call_oi_count = sum(1 for record in records if record["option_type"] == "CALL" and record["open_interest"] is not None)
+    put_oi_count = sum(1 for record in records if record["option_type"] == "PUT" and record["open_interest"] is not None)
+    call_count = sum(1 for record in records if record["option_type"] == "CALL")
+    put_count = sum(1 for record in records if record["option_type"] == "PUT")
+    print(
+        f"[OI COVERAGE] {contract}: "
+        f"CALL={call_oi_count}/{call_count}, "
+        f"PUT={put_oi_count}/{put_count}"
+    )
+
     return records
 
 
