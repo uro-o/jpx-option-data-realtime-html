@@ -96,6 +96,30 @@ class ContractSnapshotValidationTests(unittest.TestCase):
                 ).td
                 self.assertEqual(get_option_data.parse_oi_cell(cell), expected)
 
+    def test_parse_qri_nikkei_225_reference_price_and_time(self):
+        soup = get_option_data.BeautifulSoup(
+            """
+            <div id="priceInfo"><table>
+              <tr><th></th><th>現在値</th></tr>
+              <tr><td>日経平均株価 (日経225)</td><td>61,268.24 (11/11 15:01)</td></tr>
+              <tr><td>日経225先物 (26年12月限)</td><td>61,350 (11/11 15:01)</td></tr>
+            </table></div>
+            """,
+            "html.parser",
+        )
+        self.assertEqual(
+            get_option_data.parse_underlying_reference(soup),
+            (61268.24, "11/11 15:01"),
+        )
+
+    def test_parse_qri_nikkei_reference_rejects_missing_time(self):
+        soup = get_option_data.BeautifulSoup(
+            '<div id="priceInfo"><table><tr><td>日経平均株価 (日経225)</td><td>61,268.24</td></tr></table></div>',
+            "html.parser",
+        )
+        with self.assertRaisesRegex(RuntimeError, "could not be parsed"):
+            get_option_data.parse_underlying_reference(soup)
+
     def test_number_preserves_zero_and_missing_values(self):
         self.assertEqual(get_option_data.number("0"), 0.0)
         self.assertEqual(get_option_data.number("1,250"), 1250.0)
