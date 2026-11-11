@@ -70,7 +70,7 @@ QRIが公開する日経225オプション情報を定期取得し、限月・CA
 
 - 定期実行：GitHub Actionsのcron `*/5 * * * 1-5`（UTC）
 - 手動実行：Actionsの「Update JPX Option Data」から `Run workflow`
-- コード変更による自動実行：現状は `run_option_data.py` の変更のみがpushトリガー対象
+- コード変更による自動実行：`.github/workflows/update-option-data.yml`、`run_option_data.py`、`get_option_data.py`、`tests/**` の変更がpushトリガー対象
 - HTML：GitHub Pagesで `docs/` を公開する構成
 
 GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません。実際のQRI更新時刻と取得時刻はCSVの `qri_update_time` と `collected_at` で確認してください。
