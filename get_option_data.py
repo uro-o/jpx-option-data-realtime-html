@@ -1039,6 +1039,20 @@ def get_contract_data(
         "html.parser",
     )
 
+    # Temporary bounded diagnostics for the QRI underlying-index header.
+    body_text = clean_text(soup.get_text(" ", strip=True))
+    for keyword in ("現在値", "日経平均", "日経225", "約定日時", "約定", "時刻"):
+        positions = [m.start() for m in re.finditer(re.escape(keyword), body_text)]
+        for position in positions[:3]:
+            start = max(0, position - 100)
+            end = min(len(body_text), position + 220)
+            print(f"[QRI TOP DIAG] {keyword}: {body_text[start:end]}")
+    for element in soup.find_all(["dt", "th", "span", "div", "p", "time"]):
+        label = clean_text(element.get_text(" ", strip=True))
+        if label and any(k in label for k in ("現在値", "日経平均", "日経225", "約定日時")):
+            parent_text = clean_text(element.parent.get_text(" ", strip=True)) if element.parent else label
+            print(f"[QRI TOP NODE] tag={element.name} class={element.get("class", [])} id={element.get("id", "")} text={label[:120]} parent={parent_text[:240]}")
+
     title = clean_text(
         soup.title.get_text()
         if soup.title
