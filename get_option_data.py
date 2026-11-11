@@ -1053,8 +1053,17 @@ def get_contract_data(
             parent_text = clean_text(element.parent.get_text(" ", strip=True)) if element.parent else label
             print(f"[QRI TOP NODE] tag={element.name} class={element.get("class", [])} id={element.get("id", "")} text={label[:120]} parent={parent_text[:240]}")
 
+    # Inspect only the compact reference-price table, not the full page.
+    price_info = soup.select_one("#priceInfo")
+    if price_info:
+        print("[QRI PRICEINFO HTML] " + str(price_info)[:5000])
+        for tr in price_info.select("tr"):
+            cells = [clean_text(cell.get_text(" ", strip=True)) for cell in tr.find_all(["th", "td"], recursive=False)]
+            print(f"[QRI PRICE ROW] cells={cells}")
+    else:
+        print("[QRI PRICEINFO] #priceInfo not found")
+
     title = clean_text(
-        soup.title.get_text()
         if soup.title
         else ""
     )
