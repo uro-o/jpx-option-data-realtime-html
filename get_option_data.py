@@ -83,6 +83,8 @@ DISCORD_INTERVAL = 0.5
 # ============================================================
 
 FIELDNAMES = [
+    "underlying_current_price",
+    "underlying_price_time",
     "qri_update_time",
     "collected_at",
     "trading_day",
@@ -654,12 +656,48 @@ def get_contract_info(soup):
 
 
 # ============================================================
+# QRI underlying Nikkei 225 reference price
+# ============================================================
+
+def parse_underlying_reference(soup):
+    """Return the Nikkei 225 cash-index price and QRI source time."""
+    price_info = soup.select_one("#priceInfo")
+    if price_info is None:
+        raise RuntimeError("QRI reference-price table #priceInfo not found.")
+
+    for row in price_info.select("tr"):
+        cells = [
+            clean_text(cell.get_text(" ", strip=True))
+            for cell in row.find_all(["th", "td"], recursive=False)
+        ]
+        if len(cells) < 2 or "日経平均株価" not in cells[0]:
+            continue
+
+        price = extract_number(cells[1])
+        time_match = re.search(
+            r"\((\d{1,2}/\d{1,2}\s+\d{1,2}:\d{2})\)",
+            cells[1],
+        )
+        if price is None or time_match is None:
+            raise RuntimeError(
+                "QRI Nikkei 225 reference price/time could not be parsed: "
+                + repr(cells[1])
+            )
+
+        return price, time_match.group(1)
+
+    raise RuntimeError("QRI Nikkei 225 cash-index row not found in #priceInfo.")
+
+
+# ============================================================
 # Parse option table
 # ============================================================
 
 def parse_option_table(
     soup,
     contract,
+    underlying_current_price,
+    underlying_price_time,
     qri_update_time,
     collected_at,
     trading_day,
@@ -863,6 +901,12 @@ def parse_option_table(
 
         common = {
 
+            "underlying_current_price":
+                underlying_current_price,
+
+            "underlying_price_time":
+                underlying_price_time,
+
             "qri_update_time":
                 qri_update_time,
 
@@ -1039,29 +1083,13 @@ def get_contract_data(
         "html.parser",
     )
 
-    # Temporary bounded diagnostics for the QRI underlying-index header.
-    body_text = clean_text(soup.get_text(" ", strip=True))
-    for keyword in ("現在値", "日経平均", "日経225", "約定日時", "約定", "時刻"):
-        positions = [m.start() for m in re.finditer(re.escape(keyword), body_text)]
-        for position in positions[:3]:
-            start = max(0, position - 100)
-            end = min(len(body_text), position + 220)
-            print(f"[QRI TOP DIAG] {keyword}: {body_text[start:end]}")
-    for element in soup.find_all(["dt", "th", "span", "div", "p", "time"]):
-        label = clean_text(element.get_text(" ", strip=True))
-        if label and any(k in label for k in ("現在値", "日経平均", "日経225", "約定日時")):
-            parent_text = clean_text(element.parent.get_text(" ", strip=True)) if element.parent else label
-            print(f"[QRI TOP NODE] tag={element.name} class={element.get('class', [])} id={element.get('id', '')} text={label[:120]} parent={parent_text[:240]}")
-
-    # Inspect only the compact reference-price table, not the full page.
-    price_info = soup.select_one("#priceInfo")
-    if price_info:
-        print("[QRI PRICEINFO HTML] " + str(price_info)[:5000])
-        for tr in price_info.select("tr"):
-            cells = [clean_text(cell.get_text(" ", strip=True)) for cell in tr.find_all(["th", "td"], recursive=False)]
-            print(f"[QRI PRICE ROW] cells={cells}")
-    else:
-        print("[QRI PRICEINFO] #priceInfo not found")
+    underlying_current_price, underlying_price_time = (
+        parse_underlying_reference(soup)
+    )
+    print(
+        f"[UNDERLYING] Nikkei 225={underlying_current_price} "
+        f"source_time={underlying_price_time}"
+    )
 
     title = clean_text(
         soup.title.get_text()
@@ -1102,6 +1130,8 @@ def get_contract_data(
     records = parse_option_table(
         soup=soup,
         contract=contract,
+        underlying_current_price=underlying_current_price,
+        underlying_price_time=underlying_price_time,
         qri_update_time=qri_update_time,
         collected_at=collected_at,
         trading_day=trading_day,
@@ -1115,6 +1145,8 @@ def get_contract_data(
 
     return (
         qri_update_time,
+        underlying_current_price,
+        underlying_price_time,
         records,
     )
 
@@ -2281,6 +2313,7 @@ def main():
     all_records = []
 
     contract_update_times = {}
+    underlying_references = {}
     failed_contracts = []
 
     if len(CONTRACTS) != 3 or len(set(CONTRACTS)) != 3:
@@ -2294,6 +2327,8 @@ def main():
 
             (
                 qri_update_time,
+                underlying_current_price,
+                underlying_price_time,
                 records,
             ) = get_contract_data(
                 contract,
@@ -2304,6 +2339,10 @@ def main():
             contract_update_times[
                 contract
             ] = qri_update_time
+            underlying_references[contract] = (
+                underlying_current_price,
+                underlying_price_time,
+            )
 
             all_records.extend(
                 records
@@ -2338,6 +2377,24 @@ def main():
     validate_contract_records(
         all_records,
         CONTRACTS.keys(),
+    )
+
+    reference_values = set(underlying_references.values())
+    if len(reference_values) != 1:
+        raise RuntimeError(
+            "QRI reference price/time differs between contract pages: "
+            + repr(underlying_references)
+            + ". Existing data files were left unchanged."
+        )
+    reference_price, reference_time = next(iter(reference_values))
+    if not reference_price or not reference_time:
+        raise RuntimeError(
+            "QRI Nikkei 225 reference price/time is missing. "
+            "Existing data files were left unchanged."
+        )
+    print(
+        f"[UNDERLYING VALIDATION] Nikkei 225={reference_price} "
+        f"source_time={reference_time} (all 3 contract pages match)"
     )
 
     print()
