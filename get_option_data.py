@@ -1051,7 +1051,7 @@ def get_contract_data(
         label = clean_text(element.get_text(" ", strip=True))
         if label and any(k in label for k in ("現在値", "日経平均", "日経225", "約定日時")):
             parent_text = clean_text(element.parent.get_text(" ", strip=True)) if element.parent else label
-            print(f"[QRI TOP NODE] tag={element.name} class={element.get("class", [])} id={element.get("id", "")} text={label[:120]} parent={parent_text[:240]}")
+            print(f"[QRI TOP NODE] tag={element.name} class={element.get('class', [])} id={element.get('id', '')} text={label[:120]} parent={parent_text[:240]}")
 
     # Inspect only the compact reference-price table, not the full page.
     price_info = soup.select_one("#priceInfo")
@@ -1064,6 +1064,7 @@ def get_contract_data(
         print("[QRI PRICEINFO] #priceInfo not found")
 
     title = clean_text(
+        soup.title.get_text()
         if soup.title
         else ""
     )
