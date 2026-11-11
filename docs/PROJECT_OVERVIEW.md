@@ -1,6 +1,6 @@
 # フォルダ・ファイル構成
 
-最終確認日：2026-11-11
+最終確認日：2026-11-11（バー共通尺度の修正を反映）
 
 この文書はmainブランチの実ファイルを確認して作成しています。ファイルの追加・削除・役割変更があった場合は更新してください。
 
@@ -127,7 +127,7 @@ GitHub Pagesで公開する画面です。
 - CSVをブラウザ内で解析
 - 限月選択
 - 全Strike／中央±5,000／中央±2,500の表示切替
-- CALL Volume、CALL OI、Strike、PUT OI、PUT Volumeの表示
+- CALL Volume、CALL OI、Strike、PUT OI、PUT Volumeの表示（4系列は選択限月の全Strikeに対する共通尺度でバー幅を算出）
 - QRIの参考価格情報から日経平均株価・その値の時刻を取得し、画面上部に表示
 - 日経平均株価に最も近いStrikeをATMとして緑色表示（全Strikeを対象に判定）
 - Max Painはオレンジ色表示。ATMと同一Strikeの場合は両方のラベルを表示
@@ -139,6 +139,7 @@ GitHub Pagesで公開する画面です。
 注意：
 - 上部の現在値はQRI `#priceInfo` の「日経平均株価 (日経225)」行を使用します。先物値ではありません。`underlying_current_price` と `underlying_price_time` に保存します。
 - JavaScriptの数値変換は欠損値と数値0を区別します。
+- Volume/OIのバー幅はCALL Volume・CALL OI・PUT OI・PUT Volumeの4系列で共通の最大値を使って正規化します。最大値は表示範囲フィルター適用前の全Strikeから算出するため、範囲を切り替えても同じ値のバー幅は一定です。限月を切り替えた場合は、その限月の全Strikeを基準に再計算します。
 - OIのQRIハイフンは0として計算し、原表状態はopen_interest_statusに保持します。
 - StrikeごとのCALL/PUT行数、重複、不正行、真のOI欠損を検査し、不完全な場合はMax Pain・OI合計・OI比率を無効化します。画面にはCALL/PUTペア数とハイフン件数を表示します。
 - 「更新」ボタンはActions workflowへのリンクを開く構造であり、画面内で取得処理を直接実行するものではありません。
