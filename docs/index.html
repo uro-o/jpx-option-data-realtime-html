@@ -147,7 +147,9 @@ function render(){
   const cv=Math.min(100,barValue(r.callVolume)/maxVolume*100);
   const co=Math.min(100,barValue(r.callOI)/maxOI*100);
   const po=Math.min(100,barValue(r.putOI)/maxOI*100);
-  const pv=Math.min(100,barValue(r.putVolume)/maxVolume*100);\n  const callVolumeSide=classifyVolumeSide(r.callLastPrice,r.callAskPrice,r.callBidPrice);\n  const putVolumeSide=classifyVolumeSide(r.putLastPrice,r.putAskPrice,r.putBidPrice);
+  const pv=Math.min(100,barValue(r.putVolume)/maxVolume*100);
+  const callVolumeSide=classifyVolumeSide(r.callLastPrice,r.callAskPrice,r.callBidPrice);
+  const putVolumeSide=classifyVolumeSide(r.putLastPrice,r.putAskPrice,r.putBidPrice);
   // Keep valid per-strike OI visible even when another strike is incomplete.
   // Missing cells render as "—"; aggregate metrics and Max Pain remain disabled.
   const callOILabel=formatNumber(r.callOI);
