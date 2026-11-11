@@ -249,6 +249,10 @@ class DashboardDataQualityTests(unittest.TestCase):
             "function findATMStrike(",
             "function getStoredMaxPain(",
         )
+        cls.classify_volume_js = extract(
+            "function classifyVolumeSide(",
+            "function findATMStrike(",
+        )
 
     def evaluate_dashboard_quality(self, rows):
         script = f"""
@@ -301,7 +305,46 @@ console.log(JSON.stringify({{nearest, tie, noPrice: findATMStrike(rows, null)}})
             {"nearest": 61250, "tie": 61000, "noPrice": None},
         )
 
-    def test_volume_side_classification_requires_exact_quote_match(self):\n        script = f"""\nfunction num(value) {{\n  if (value === null || value === undefined) return null;\n  const text = String(value).replace(/,/g, "").trim();\n  if (text === "" || ["-", "--", "－", "―", "—"].includes(text)) return null;\n  const n = Number(text);\n  return Number.isFinite(n) ? n : null;\n}}\n{self.classify_volume_js}\nconsole.log(JSON.stringify([\n  classifyVolumeSide(105, 105, 100),\n  classifyVolumeSide(100, 105, 100),\n  classifyVolumeSide(102, 105, 100),\n  classifyVolumeSide(105, 105, 105),\n  classifyVolumeSide(null, 105, 100),\n  classifyVolumeSide(105, null, 100)\n]));\n"""\n        result = subprocess.run(["node", "-e", script], check=True, capture_output=True, text=True)\n        self.assertEqual(json.loads(result.stdout), ["ask", "bid", "unknown", "unknown", "unknown", "unknown"])\n\n    def test_dashboard_volume_cells_have_side_classification(self):\n        html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"\n        html = html_path.read_text(encoding="utf-8")\n        self.assertIn("const callVolumeSide=classifyVolumeSide(r.callLastPrice,r.callAskPrice,r.callBidPrice);", html)\n        self.assertIn("const putVolumeSide=classifyVolumeSide(r.putLastPrice,r.putAskPrice,r.putBidPrice);", html)\n        self.assertIn("volume-${callVolumeSide}", html)\n        self.assertIn("volume-${putVolumeSide}", html)\n        self.assertIn("判定困難", html)\n\n    def test_dashboard_script_parses_and_atm_precedes_range_filter(self):
+    def test_volume_side_classification_requires_exact_quote_match(self):
+        script = f"""
+function num(value) {{
+  if (value === null || value === undefined) return null;
+  const text = String(value).replace(/,/g, "").trim();
+  if (text === "" || ["-", "--", "－", "―", "—"].includes(text)) return null;
+  const n = Number(text);
+  return Number.isFinite(n) ? n : null;
+}}
+{self.classify_volume_js}
+console.log(JSON.stringify([
+  classifyVolumeSide(105, 105, 100),
+  classifyVolumeSide(100, 105, 100),
+  classifyVolumeSide(102, 105, 100),
+  classifyVolumeSide(105, 105, 105),
+  classifyVolumeSide(null, 105, 100),
+  classifyVolumeSide(105, null, 100)
+]));
+"""
+        result = subprocess.run(
+            ["node", "-e", script],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            json.loads(result.stdout),
+            ["ask", "bid", "unknown", "unknown", "unknown", "unknown"],
+        )
+
+    def test_dashboard_volume_cells_have_side_classification(self):
+        html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
+        html = html_path.read_text(encoding="utf-8")
+        self.assertIn("const callVolumeSide=classifyVolumeSide(r.callLastPrice,r.callAskPrice,r.callBidPrice);", html)
+        self.assertIn("const putVolumeSide=classifyVolumeSide(r.putLastPrice,r.putAskPrice,r.putBidPrice);", html)
+        self.assertIn("volume-${callVolumeSide}", html)
+        self.assertIn("volume-${putVolumeSide}", html)
+        self.assertIn("判定困難", html)
+
+    def test_dashboard_script_parses_and_atm_precedes_range_filter(self):
         html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
         html = html_path.read_text(encoding="utf-8")
         script = html.split("<script>", 1)[1].split("</script>", 1)[0]
