@@ -2,7 +2,7 @@
 
 QRIが公開する日経225オプション情報を定期取得し、限月・CALL/PUT・Strike別にCSV保存する個人用モニターです。GitHub Actionsでデータ取得を実行し、GitHub Pagesで公開するHTMLから最新CSVを読み込みます。
 
-> **重要：** このREADMEは2026-11-09時点のコードとデータを確認した現状説明です。OI欄のQRIハイフンはJPX日次建玉データ由来の公開表との複数Strike照合に基づき0として集計し、原表状態は `open_interest_status` に保持します。QRI自身の仕様説明は未確認のため、ハイフン件数を画面に残しています。
+> **重要：** このREADMEは2026-11-11時点のコードとデータを確認した現状説明です。OI欄のQRIハイフンはJPX日次建玉データ由来の公開表との複数Strike照合に基づき0として集計し、原表状態は `open_interest_status` に保持します。QRI自身の仕様説明は未確認のため、ハイフン件数を画面に残しています。日経平均株価の現在値・QRI表示の約定時刻も取得し、ATMを判定します。
 
 ## まず見る場所
 
@@ -22,7 +22,7 @@ QRIが公開する日経225オプション情報を定期取得し、限月・CA
 4. `run_option_data.py` が `get_option_data.py` の限月設定と履歴保存関数を差し替え、取得処理を実行する。
 5. `get_option_data.py` がQRIの3ページを取得・解析し、全限月・全StrikeのCALL/PUTペアを検証する。検証成功後に差分・Discord通知・最新CSV等を更新する。
 6. Actionsが `data/` の変更をコミットしてmainへpushする。
-7. `docs/index.html` がGitHub上の `data/latest.csv` を読み込み、Strike別のCALL/PUT情報を表示する。
+7. `docs/index.html` がGitHub上の `data/latest.csv` を読み込み、日経平均株価・QRI約定時刻・ATM・Max Pain・Strike別CALL/PUT情報を表示する。
 
 詳細は[運用ガイド](docs/OPERATIONS.md)を参照してください。
 
@@ -32,11 +32,11 @@ QRIが公開する日経225オプション情報を定期取得し、限月・CA
 |---|---|
 | `.github/workflows/update-option-data.yml` | 自動実行・依存関係インストール・データcommit |
 | `run_option_data.py` | 限月とQRI URLの選定、日次履歴保存の制御 |
-| `get_option_data.py` | QRI取得、HTML解析、CSV保存、差分計算、Discord通知 |
+| `get_option_data.py` | QRI取得、HTML解析、日経平均株価と時刻の取得、CSV保存、差分計算、Discord通知 |
 | `calculate_difference.py` | `latest.csv` と `previous.csv` を比較する独立した差分・通知処理 |
 | `detect_large_trades.py` | `differences.csv` を使う独立した大口変動検出処理 |
 | `notify_discord.py` | `differences.csv` を使う独立した通知・重複通知管理処理 |
-| `docs/index.html` | GitHub Pages用のモニター画面 |
+| `docs/index.html` | GitHub Pages用のモニター画面。日経平均株価を基準にATMを緑色表示し、Max Painをオレンジ色表示 |
 | `tests/test_data_validation.py` | Python取得検証とHTML側Max Pain品質判定のテスト |
 | `data/latest.csv` | 最新取得データ |
 | `data/differences.csv` | 現行取得処理が生成する前回比較データ |
@@ -57,6 +57,14 @@ QRIが公開する日経225オプション情報を定期取得し、限月・CA
 | 3番目の限月 | https://svc.qri.jp/jpx/nkopm/2 |
 
 限月は固定値ではなく、実行日とSQ日をもとに計算します。2026-11-05に、12月限が2番目と3番目に重複してしまう不具合を修正しました。現在は3番目を「2番目の限月より後にある最初の四半期限月」として選択し、重複した限月キーが生じた場合はエラーにします。
+
+## 現在値・ATM・Max Pain
+
+- 日経平均株価はQRIページ上部の `#priceInfo` にある「日経平均株価 (日経225)」行から取得します。先物価格はATM判定に使用しません。
+- CSVの `underlying_current_price` と `underlying_price_time` に保存します。時刻はQRI表示の月/日・時:分です。
+- ATMは選択中限月の全Strikeから、日経平均株価に最も近いStrikeを選びます。表示範囲を絞ってもATM判定対象は全Strikeです。
+- ATMは緑色、Max Painはオレンジ色です。同一Strikeに重なった場合は両方のマーカーを表示します。
+- 3つの限月ページで現在値と時刻が一致しない場合、または取得できない場合はスナップショットを保存しません。
 
 ## 実行・更新
 
