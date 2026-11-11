@@ -130,14 +130,15 @@ function render(){
  document.getElementById("oiRatio").textContent=oiComplete?(totalPutOI>0?(totalCallOI/totalPutOI).toFixed(2):"---"):"OI不完全";
  document.getElementById("selectedContract").textContent=formatContract(selectedContract);
  rows.sort((a,b)=>b.strike-a.strike);
+ // 選択限月の全Strikeを基準に尺度を固定する。表示範囲を切り替えても同じ枚数は同じ横幅になる。
+ // CALL Volume / CALL OI / PUT OI / PUT Volume の4系列で共通の最大値を使う。
+ const maxScale=Math.max(1,...rows.map(r=>Math.max(barValue(r.callVolume),barValue(r.callOI),barValue(r.putOI),barValue(r.putVolume))));
  const range=rangeSelect.value;
  if(range!=="all"){
   const center=atmStrike??rows[Math.floor(rows.length/2)].strike;
   const distance=range==="near2500"?2500:5000;
   rows=rows.filter(r=>Math.abs(r.strike-center)<=distance);
  }
- // VolumeとOIは同じ「枚数」なので、4系列で共通の最大値を使い横幅の比率を統一する。
- const maxScale=Math.max(1,...rows.map(r=>Math.max(barValue(r.callVolume),barValue(r.callOI),barValue(r.putOI),barValue(r.putVolume))));
  chart.innerHTML="";
  rows.forEach(r=>{
   const row=document.createElement("div");
