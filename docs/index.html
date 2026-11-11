@@ -95,7 +95,10 @@ function render(){
   document.getElementById("oiRatio").textContent="---";
   return;
  }
- const periodLabel=formatVolumePeriod();\n document.getElementById("callVolumePeriod").textContent="累積期間："+periodLabel;\n document.getElementById("putVolumePeriod").textContent="累積期間："+periodLabel;\n const oiComplete=areOIValuesComplete(rows,quality);
+ const periodLabel=formatVolumePeriod();
+ document.getElementById("callVolumePeriod").textContent="累積期間："+periodLabel;
+ document.getElementById("putVolumePeriod").textContent="累積期間："+periodLabel;
+ const oiComplete=areOIValuesComplete(rows,quality);
  const anyOI=hasAnyOI(rows);
  const currentMaxPain=calculateMaxPain(rows,quality);
  const underlying=getUnderlyingReference();
