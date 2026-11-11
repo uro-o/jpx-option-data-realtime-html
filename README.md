@@ -71,6 +71,10 @@ GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません�
 
 `get_option_data.py` は環境変数 `DISCORD_WEBHOOK_URL` を参照します。Webhook URLをソースコードやREADMEへ直接記載しないでください。GitHub Actionsで利用する場合は、GitHub Secrets等の安全な仕組みで環境変数として渡す設定が必要です。現在のworkflow本文にはSecretsを環境変数へ渡す記述が見当たらないため、通知が必要な場合は設定状況を確認してください。
 
+## 最終約定価格・約定日時の表示
+
+`data/latest.csv` の `last_price` と `trade_time` は、StrikeごとのCALL/PUTそれぞれの最終約定価格と約定日時です。HTMLではCALL Volume欄・PUT Volume欄の下段に「最終価格 · 約定日時」を併記します。これはQRIページ上部の指数・先物等の現在値とは別データです。約定日時が空欄の場合は、存在しない時刻を補完せず、取得できた最終価格だけを表示します。
+
 ## 現在確認されている注意点
 
 - 3限月すべての取得成功と、各StrikeのCALL/PUTペアを検証してから出力を更新します。取得失敗・欠損・重複があれば処理をエラー終了し、既存の最新CSV等を保持します。
@@ -78,7 +82,7 @@ GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません�
 - 出来高差分は前回・今回の取引日が同じ場合だけ計算します。取引日が変わった場合や日付が不明な場合は、出来高差分・出来高アラートを出しません。
 - Discord送信失敗後も最新CSVが更新されるため、通知を再送できない可能性があります。
 - `calculate_difference.py`、`detect_large_trades.py`、`notify_discord.py` は独立スクリプトであり、現在のActionsワークフローからは呼び出されていません。
-- HTMLの現在値欄には現状、価格を設定する取得処理がありません。
+- HTML上部の「現在値」欄は、現状は価格取得処理が未接続です。今回追加するCALL/PUTの `last_price`・`trade_time` 表示とは別項目です。
 - HTMLではStrikeごとのCALL/PUTペア、重複行、不正行、OI欠損を検査します。QRIハイフンは0として集計し、件数も表示します。実データではOI数値が全Strikeで揃い、Max Pain・OI合計・OI比率を計算できます。空セル・解析不能が出た場合は従来どおり計算を停止します。ただし、CALL/PUT両方の行が同じStrikeで丸ごと欠けた場合は、QRI側の期待Strike一覧がないため検知できません。
 - `requirements.txt` はまだありません。データ完全性・欠損値・差分計算の自動テストを `tests/test_data_validation.py` に追加し、Actionsで毎回実行します。
 
@@ -97,3 +101,6 @@ GitHub Actionsのscheduleは指定時刻どおりの起動を保証しません�
 ## ドキュメント更新履歴
 
 - 2026-11-05：コードとデータ構成を確認し、READMEおよび運用・構成・データ項目・改善課題の文書を追加。Max PainのCALL/PUTペア・重複・OI取得率チェックとHTMLテストを追加。
+
+
+- 2026-11-11：HTMLのCALL/PUT各出来高欄に、CSVの `last_price`（最終約定価格）と `trade_time`（最終約定日時）を表示する機能を追加。指数等の現在値欄とは区別。
