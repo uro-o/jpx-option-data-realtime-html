@@ -301,6 +301,21 @@ console.log(JSON.stringify({{nearest, tie, noPrice: findATMStrike(rows, null)}})
             {"nearest": 61250, "tie": 61000, "noPrice": None},
         )
 
+    def test_dashboard_script_parses_and_atm_precedes_range_filter(self):
+        html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
+        html = html_path.read_text(encoding="utf-8")
+        script = html.split("<script>", 1)[1].split("</script>", 1)[0]
+        subprocess.run(
+            ["node", "-e", f"new Function({json.dumps(script)});"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertLess(
+            html.index("const atmStrike=findATMStrike(rows,underlyingPrice);"),
+            html.index('if(range!=="all")'),
+        )
+
     def test_dashboard_exposes_qri_reference_price_and_atm_markers(self):
         html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
         html = html_path.read_text(encoding="utf-8")
