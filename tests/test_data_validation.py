@@ -245,6 +245,10 @@ class DashboardDataQualityTests(unittest.TestCase):
             "function calculateMaxPain(",
             "function setMaxPainDisplay(",
         )
+        cls.find_atm_js = extract(
+            "function findATMStrike(",
+            "function getStoredMaxPain(",
+        )
 
     def evaluate_dashboard_quality(self, rows):
         script = f"""
@@ -277,6 +281,34 @@ console.log(JSON.stringify({{
             text=True,
         )
         return json.loads(result.stdout)
+
+    def test_dashboard_atm_uses_nearest_strike_and_lower_strike_on_tie(self):
+        script = f"""
+{self.find_atm_js}
+const rows = [{{strike: 61500}}, {{strike: 61250}}, {{strike: 61000}}];
+const nearest = findATMStrike(rows, 61268.31);
+const tie = findATMStrike(rows, 61125);
+console.log(JSON.stringify({{nearest, tie, noPrice: findATMStrike(rows, null)}}));
+"""
+        result = subprocess.run(
+            ["node", "-e", script],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            json.loads(result.stdout),
+            {"nearest": 61250, "tie": 61000, "noPrice": None},
+        )
+
+    def test_dashboard_exposes_qri_reference_price_and_atm_markers(self):
+        html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
+        html = html_path.read_text(encoding="utf-8")
+        self.assertIn('id="currentPriceTime"', html)
+        self.assertIn('d.underlying_current_price', html)
+        self.assertIn('row.classList.add("atm-row")', html)
+        self.assertIn('.max-pain-row.atm-row .strike', html)
+        self.assertIn('🟩 ATM', html)
 
     def test_dashboard_keeps_available_strike_oi_visible_when_incomplete(self):
         html_path = pathlib.Path(__file__).resolve().parents[1] / "docs" / "index.html"
