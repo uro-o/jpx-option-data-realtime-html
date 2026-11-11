@@ -136,18 +136,18 @@ function render(){
   const distance=range==="near2500"?2500:5000;
   rows=rows.filter(r=>Math.abs(r.strike-center)<=distance);
  }
- const maxVolume=Math.max(1,...rows.map(r=>Math.max(barValue(r.callVolume),barValue(r.putVolume))));
- const maxOI=Math.max(1,...rows.map(r=>Math.max(barValue(r.callOI),barValue(r.putOI))));
+ // VolumeとOIは同じ「枚数」なので、4系列で共通の最大値を使い横幅の比率を統一する。
+ const maxScale=Math.max(1,...rows.map(r=>Math.max(barValue(r.callVolume),barValue(r.callOI),barValue(r.putOI),barValue(r.putVolume))));
  chart.innerHTML="";
  rows.forEach(r=>{
   const row=document.createElement("div");
   row.className="option-row";
   if(currentMaxPain!==null&&r.strike===currentMaxPain)row.classList.add("max-pain-row");
   if(atmStrike!==null&&r.strike===atmStrike)row.classList.add("atm-row");
-  const cv=Math.min(100,barValue(r.callVolume)/maxVolume*100);
-  const co=Math.min(100,barValue(r.callOI)/maxOI*100);
-  const po=Math.min(100,barValue(r.putOI)/maxOI*100);
-  const pv=Math.min(100,barValue(r.putVolume)/maxVolume*100);
+  const cv=Math.min(100,barValue(r.callVolume)/maxScale*100);
+  const co=Math.min(100,barValue(r.callOI)/maxScale*100);
+  const po=Math.min(100,barValue(r.putOI)/maxScale*100);
+  const pv=Math.min(100,barValue(r.putVolume)/maxScale*100);
   const callVolumeSide=classifyVolumeSide(r.callLastPrice,r.callAskPrice,r.callBidPrice);
   const putVolumeSide=classifyVolumeSide(r.putLastPrice,r.putAskPrice,r.putBidPrice);
   // Keep valid per-strike OI visible even when another strike is incomplete.
