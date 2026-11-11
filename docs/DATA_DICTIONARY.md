@@ -1,6 +1,6 @@
 # CSVデータ項目・保存仕様
 
-最終更新日：2026-11-11（CALL/PUT最終約定価格・日時のHTML表示を追加）
+最終更新日：2026-11-11（日経平均現在値・QRI時刻・ATM表示を追加）
 
 ## 1. 最新データ
 
@@ -10,6 +10,8 @@
 
 | 列名 | 意味 | 注意点 |
 |---|---|---|
+| `underlying_current_price` | QRI参考価格情報の日経平均株価（Nikkei 225現物指数） | ATM判定の基準。先物価格ではない。全オプション行に同じスナップショット値を保持 |
+| `underlying_price_time` | 上記日経平均株価に併記されたQRI時刻 | `M/D HH:MM` 形式。QRI表示どおりの月/日・時:分。取得時刻 `collected_at` とは異なる |
 | `qri_update_time` | QRIページの更新時刻 | QRI側の時刻。取得時刻とは異なる |
 | `collected_at` | プログラムが取得した日時 | JSTオフセット付きISO形式 |
 | `trading_day` | QRIが示す取引日 | 夜間取引では暦日と異なる場合がある |
@@ -32,6 +34,8 @@
 | `change_percent` | 価格変化率 | QRI表示値 |
 | `last_price` | 最終約定価格 | 未約定・未取得は空欄になり得る |
 | `trade_time` | 当該CALL/PUTの最終約定時刻 | 同じ行の `last_price` に対応。表示形式はQRI側に依存。CALL/PUT別に保持 |
+
+`underlying_current_price` と `underlying_price_time` はページ上部の参考価格情報にある日経平均株価と、その値に併記された時刻です。3限月ページ間で値・時刻が一致することを確認してから保存します。HTMLはこの価格を使い、選択限月の全Strikeのうち最も近いStrikeをATMとします。表示範囲を絞る前に判定するため、画面フィルターによってATMが変わることはありません。
 
 `last_price` と `trade_time` はオプション銘柄ごとの情報です。HTMLではCALL Volume欄・PUT Volume欄の下段に「最終価格 · 約定日時」として表示します。QRIページ上部の指数等の現在値・約定日時とは異なります。
 
