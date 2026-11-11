@@ -1,6 +1,6 @@
 # CSVデータ項目・保存仕様
 
-最終更新日：2026-11-09（QRI OIハイフンの扱いを更新）
+最終更新日：2026-11-11（CALL/PUT最終約定価格・日時のHTML表示を追加）
 
 ## 1. 最新データ
 
@@ -31,7 +31,9 @@
 | `change` | 価格変化 | QRI表示値 |
 | `change_percent` | 価格変化率 | QRI表示値 |
 | `last_price` | 最終約定価格 | 未約定・未取得は空欄になり得る |
-| `trade_time` | 最終約定時刻 | 表示形式はQRI側に依存 |
+| `trade_time` | 当該CALL/PUTの最終約定時刻 | 同じ行の `last_price` に対応。表示形式はQRI側に依存。CALL/PUT別に保持 |
+
+`last_price` と `trade_time` はオプション銘柄ごとの情報です。HTMLではCALL Volume欄・PUT Volume欄の下段に「最終価格 · 約定日時」として表示します。QRIページ上部の指数等の現在値・約定日時とは異なります。
 
 ## 2. 差分データ
 
